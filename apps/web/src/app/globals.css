@@ -10,8 +10,8 @@
   --card-hover: #fffdf8;
   --ink: #111827;
   --ink-2: #374151;
-  --muted: #6b7280;
-  --faint: #9ca3af;
+  --muted: #545b68;
+  --faint: #626976; /* ≥4.5:1 on every light surface, incl. sidebar gradient */
   --line: #ebe7e0;
   --line-strong: #dcd6cc;
   --accent: #ffc000;
@@ -58,8 +58,8 @@
   --card-hover: #18202a;
   --ink: #e8edf2;
   --ink-2: #c4ccd5;
-  --muted: #8b96a3;
-  --faint: #66717d;
+  --muted: #a3adb9;
+  --faint: #8792a0;
   --line: #222b36;
   --line-strong: #2d3845;
   --accent: #ffc000;
@@ -98,16 +98,16 @@
   --chart-grid: #1c242e;
 }
 
-/* Type scale: Tailwind's defaults + 1px (xs 12→13 … 4xl 36→37). Line heights keep Tailwind's ratios. */
+/* Type scale: Tailwind's defaults + 2.5px (xs 12→14.5 … 4xl 36→38.5). Line heights keep Tailwind's ratios. */
 @theme {
-  --text-xs: 0.8125rem;
-  --text-sm: 0.9375rem;
-  --text-base: 1.0625rem;
-  --text-lg: 1.1875rem;
-  --text-xl: 1.3125rem;
-  --text-2xl: 1.5625rem;
-  --text-3xl: 1.9375rem;
-  --text-4xl: 2.3125rem;
+  --text-xs: 0.90625rem;
+  --text-sm: 1.03125rem;
+  --text-base: 1.15625rem;
+  --text-lg: 1.28125rem;
+  --text-xl: 1.40625rem;
+  --text-2xl: 1.65625rem;
+  --text-3xl: 2.03125rem;
+  --text-4xl: 2.40625rem;
 }
 
 @theme inline {
@@ -159,7 +159,7 @@
 
 html { -webkit-text-size-adjust: 100%; }
 body {
-  font-size: 1.0625rem; /* 17px: browser default + 1px for text without an explicit size */
+  font-size: 1.15625rem; /* 18.5px: browser default + 2.5px for text without an explicit size */
   background: var(--page-glow), var(--bg);
   background-attachment: fixed;
   color: var(--ink);

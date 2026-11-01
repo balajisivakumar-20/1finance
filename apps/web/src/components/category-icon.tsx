@@ -28,7 +28,7 @@ export function InstitutionAvatar({ slug, name, type, className }: { slug: strin
   const color = INST_COLORS[slug] ?? "#475569";
   const Icon = type ? ACCOUNT_ICONS[type] : null;
   return (
-    <span className={cn("relative grid size-10 shrink-0 place-items-center rounded-2xl text-[14px] font-semibold", className)}
+    <span className={cn("relative grid size-10 shrink-0 place-items-center rounded-2xl text-[15.5px] font-semibold", className)}
       style={{ background: `color-mix(in srgb, ${color} 12%, transparent)`, color }} aria-hidden>
       {name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
       {Icon && <span className="absolute -bottom-1 -right-1 grid size-5 place-items-center rounded-full border-2 border-card bg-card text-muted"><Icon className="size-3" /></span>}

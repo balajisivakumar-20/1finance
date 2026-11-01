@@ -46,7 +46,7 @@ export default function GoalsPage() {
       <PageHeader title="Goals" subtitle="Save with purpose. Progress counts only the amounts you log here — statements and balances never change it."
         action={<Button variant="primary" onClick={() => setEditing("new")}><Plus />New goal</Button>} />
       {data?.overlaps.map((o) => (
-        <div key={o.account_id} className="flex items-start gap-2 rounded-2xl bg-warn-soft px-4 py-3 text-[14px] text-ink-2">
+        <div key={o.account_id} className="flex items-start gap-2 rounded-2xl bg-warn-soft px-4 py-3 text-[15.5px] text-ink-2">
           <TriangleAlert className="mt-0.5 size-4 text-warn" />The same account is linked to {o.goals.join(" and ")} — the same money may be counted twice.
         </div>
       ))}
@@ -62,22 +62,22 @@ export default function GoalsPage() {
                 <span className="grid size-10 place-items-center rounded-2xl bg-accent-soft text-accent-fg"><Icon className="size-5" /></span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-ink">{g.name}</p>
-                  <p className="text-[13px] text-muted">{g.target_date ? `Target ${formatDate(g.target_date, "d MMM yyyy")}` : "No target date"}</p>
+                  <p className="text-[14.5px] text-muted">{g.target_date ? `Target ${formatDate(g.target_date, "d MMM yyyy")}` : "No target date"}</p>
                 </div>
                 {pct >= 100 ? <Badge tone="pos">Achieved</Badge> : g.on_track === true ? <Badge tone="pos">On track</Badge> : g.on_track === false ? <Badge tone="warn">Behind</Badge> : null}
               </div>
               <div className="mt-5 flex items-end justify-between">
                 <div>
-                  <p className="text-[13px] text-muted">Saved so far</p>
+                  <p className="text-[14.5px] text-muted">Saved so far</p>
                   <p className="text-2xl font-semibold tracking-tight text-ink"><Money value={g.current} currency={g.currency} decimals={0} /></p>
                 </div>
-                <p className="text-[14px] text-muted">of <Money value={g.target} currency={g.currency} decimals={0} /></p>
+                <p className="text-[15.5px] text-muted">of <Money value={g.target} currency={g.currency} decimals={0} /></p>
               </div>
               <Progress className="mt-3" value={pct} label={`${g.name} progress`} />
-              <div className="mt-2 flex justify-between text-[13px] text-muted"><span>{formatPct(g.progress_pct, { decimals: 0 })} complete</span><span><Money value={g.remaining} currency={g.currency} decimals={0} /> to go</span></div>
+              <div className="mt-2 flex justify-between text-[14.5px] text-muted"><span>{formatPct(g.progress_pct, { decimals: 0 })} complete</span><span><Money value={g.remaining} currency={g.currency} decimals={0} /> to go</span></div>
               {g.history.length > 1 && <div className="mt-3"><MiniLine points={g.history.map((h) => ({ date: h.date, v: h.amount }))} currency={g.currency} height={70} /></div>}
               <div className="mt-auto pt-4">
-                <p className="flex items-center gap-1.5 text-[13px] text-ink-2"><CalendarClock className="size-3.5 text-muted" />
+                <p className="flex items-center gap-1.5 text-[14.5px] text-ink-2"><CalendarClock className="size-3.5 text-muted" />
                   {g.estimated_completion ? <>Est. completion {formatDate(g.estimated_completion, "MMM yyyy")} at <Money value={g.monthly_plan} currency={g.currency} decimals={0} />/month</> : "Set a monthly plan to estimate completion"}</p>
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" className="flex-1" onClick={() => setLogFor({ goal: g })}><Plus />Log savings</Button>
@@ -113,10 +113,10 @@ function GoalLogSheet({ goal, onClose, onLog, onEdit, onChanged }: { goal: Goal;
           {goal.contributions.map((c) => (
             <li key={c.id} className="flex items-center gap-3 py-3">
               <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-medium text-ink">{formatDate(c.date)}</p>
-                {c.note && <p className="truncate text-[13px] text-muted">{c.note}</p>}
+                <p className="text-[15.5px] font-medium text-ink">{formatDate(c.date)}</p>
+                {c.note && <p className="truncate text-[14.5px] text-muted">{c.note}</p>}
               </div>
-              <p className={Number(c.amount) < 0 ? "text-[14px] font-medium text-neg" : "text-[14px] font-medium text-ink"}><Money value={c.amount} currency={c.currency} /></p>
+              <p className={Number(c.amount) < 0 ? "text-[15.5px] font-medium text-neg" : "text-[15.5px] font-medium text-ink"}><Money value={c.amount} currency={c.currency} /></p>
               <Button size="icon-sm" variant="ghost" aria-label="Edit entry" onClick={() => onLog(c)}><Pencil /></Button>
               <Button size="icon-sm" variant="ghost" aria-label="Delete entry" onClick={() => confirm("Delete this entry?") && del.mutate(c.id)}><Trash2 /></Button>
             </li>

@@ -81,8 +81,8 @@ function Sidebar() {
         <AnimatePresence initial={false}>
           {!collapsed && (
             <motion.div key="brand" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }} transition={{ duration: 0.2 }} className="min-w-0 flex-1">
-              <p className="truncate text-[20px] font-semibold leading-tight tracking-tight text-ink">1Finance</p>
-              <p className="truncate text-[14px] text-muted">Personal finance</p>
+              <p className="truncate text-[21.5px] font-semibold leading-tight tracking-tight text-ink">1Finance</p>
+              <p className="truncate text-[15.5px] text-muted">Personal finance</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -98,7 +98,7 @@ function Sidebar() {
       <nav className={cn("flex-1 overflow-y-auto overflow-x-hidden pb-3", collapsed ? "px-3 pt-3" : "px-4 pt-4")}>
         {SECTIONS.map((section) => (
           <div key={section} className={cn(collapsed ? "space-y-1.5 pb-3" : "pb-4")}>
-            {!collapsed && <p className="px-3 pb-2 pt-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">{section}</p>}
+            {!collapsed && <p className="px-3 pb-2 pt-1 text-[13.5px] font-semibold uppercase tracking-[0.14em] text-faint">{section}</p>}
             <div className="space-y-1">
               {NAV.filter((n) => n.section === section).map((item) => <SideLink key={item.href} item={item} active={isActive(pathname, item.href)} collapsed={collapsed} />)}
             </div>
@@ -117,7 +117,7 @@ function Sidebar() {
 function SideLink({ item, active, collapsed }: { item: NavItem; active: boolean; collapsed: boolean }) {
   const link = (
     <Link href={item.href} aria-current={active ? "page" : undefined} aria-label={collapsed ? item.label : undefined}
-      className={cn("group relative flex items-center gap-3 text-[16px] font-medium transition-colors duration-200",
+      className={cn("group relative flex items-center gap-3 text-[17.5px] font-medium transition-colors duration-200",
         collapsed ? "mx-auto size-[52px] justify-center rounded-[18px]" : "h-12 rounded-full px-4",
         active ? "text-ink" : "text-ink-2/80 hover:text-ink")}>
       {active && <motion.span layoutId="nav-active" className="nav-pill absolute inset-0" style={{ borderRadius: collapsed ? 18 : 999 }} transition={SPRING} />}
@@ -155,18 +155,18 @@ function Header({ onSearch }: { onSearch: () => void }) {
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={nav?.href ?? pathname} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}
             className="hidden min-w-0 lg:block">
-            <p className="truncate text-[18px] font-semibold tracking-tight text-ink">{nav?.label ?? "1Finance"}</p>
-            {blurb && <p className="truncate text-[14px] text-muted">{blurb}</p>}
+            <p className="truncate text-[19.5px] font-semibold tracking-tight text-ink">{nav?.label ?? "1Finance"}</p>
+            {blurb && <p className="truncate text-[15.5px] text-muted">{blurb}</p>}
           </motion.div>
         </AnimatePresence>
         <div className="ml-auto flex min-w-0 items-center gap-0.5 sm:gap-1">
           <button onClick={onSearch} aria-label="Search"
-            className="mr-1 flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full border border-line/80 bg-card/80 text-[14px] text-faint shadow-card backdrop-blur transition-all duration-200 hover:border-line-strong hover:text-muted sm:w-64 sm:justify-start sm:px-4">
+            className="mr-1 flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full border border-line/80 bg-card/80 text-[15.5px] text-faint shadow-card backdrop-blur transition-all duration-200 hover:border-line-strong hover:text-muted sm:w-64 sm:justify-start sm:px-4">
             <Search className="size-4 shrink-0" aria-hidden />
             <span className="hidden truncate sm:inline">Search…</span>
-            <kbd className="ml-auto hidden rounded-full border border-line bg-bg-subtle px-2 py-0.5 font-sans text-[12px] text-muted sm:inline">{isMac ? "⌘" : "Ctrl"} K</kbd>
+            <kbd className="ml-auto hidden rounded-full border border-line bg-bg-subtle px-2 py-0.5 font-sans text-[13.5px] text-muted sm:inline">{isMac ? "⌘" : "Ctrl"} K</kbd>
           </button>
-          <span className="mr-1 hidden text-[13px] text-muted 2xl:inline" title={summary?.last_sync ?? undefined}>
+          <span className="mr-1 hidden text-[14.5px] text-muted 2xl:inline" title={summary?.last_sync ?? undefined}>
             {summary?.last_sync ? `Synced ${ago(summary.last_sync)}` : "Not synced yet"}
           </span>
           <Tip content="Refresh all accounts">
@@ -203,7 +203,7 @@ function CurrencyMenu() {
           {CURRENCIES.map((x) => <MenuRadioItem key={x} value={x}>{x}</MenuRadioItem>)}
         </MenuRadioGroup>
         <MenuSeparator />
-        <p className="px-2.5 pb-1.5 pt-1 text-[12px] leading-snug text-faint">Original currencies are always preserved; conversions use stored exchange rates.</p>
+        <p className="px-2.5 pb-1.5 pt-1 text-[13.5px] leading-snug text-faint">Original currencies are always preserved; conversions use stored exchange rates.</p>
       </MenuContent>
     </Menu>
   );
@@ -248,15 +248,15 @@ function Notifications() {
       <MenuContent className="w-80 p-0">
         <div className="border-b border-line px-4 py-3 text-sm font-semibold">Notifications</div>
         <div className="max-h-96 overflow-y-auto p-1.5">
-          {data.length === 0 && <p className="px-3 py-6 text-center text-[14px] text-muted">You&apos;re all caught up.</p>}
+          {data.length === 0 && <p className="px-3 py-6 text-center text-[15.5px] text-muted">You&apos;re all caught up.</p>}
           {data.map((n) => (
             <div key={n.id} className="rounded-xl px-3 py-2.5 hover:bg-bg-subtle">
               <div className="flex items-center gap-2">
                 {!n.read && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label="Unread" />}
-                <p className="text-[14px] font-medium text-ink">{n.title}</p>
+                <p className="text-[15.5px] font-medium text-ink">{n.title}</p>
               </div>
-              {n.body && <p className="mt-0.5 text-[13px] text-muted">{n.body}</p>}
-              <p className="mt-1 text-[12px] text-faint">{ago(n.created_at)}</p>
+              {n.body && <p className="mt-0.5 text-[14.5px] text-muted">{n.body}</p>}
+              <p className="mt-1 text-[13.5px] text-faint">{ago(n.created_at)}</p>
             </div>
           ))}
         </div>
@@ -275,7 +275,7 @@ function ProfileMenu({ variant }: { variant: "avatar" | "card" }) {
     qc.clear();
     router.replace("/login");
   };
-  const avatar = <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-[15px] font-semibold text-accent-fg ring-1 ring-accent/30">{initials}</span>;
+  const avatar = <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-[16.5px] font-semibold text-accent-fg ring-1 ring-accent/30">{initials}</span>;
   return (
     <Menu>
       <MenuTrigger asChild>
@@ -283,8 +283,8 @@ function ProfileMenu({ variant }: { variant: "avatar" | "card" }) {
           <button className="flex w-full items-center gap-3 rounded-[22px] p-2 text-left transition-colors duration-200 hover:bg-card/55" aria-label="Profile menu">
             {avatar}
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[16px] font-semibold text-ink">{me?.display_name}</span>
-              <span className="block truncate text-[13.5px] text-muted">{me?.email}</span>
+              <span className="block truncate text-[17.5px] font-semibold text-ink">{me?.display_name}</span>
+              <span className="block truncate text-[15px] text-muted">{me?.email}</span>
             </span>
             <ChevronsUpDown className="size-4 shrink-0 text-muted" aria-hidden />
           </button>
@@ -294,8 +294,8 @@ function ProfileMenu({ variant }: { variant: "avatar" | "card" }) {
       </MenuTrigger>
       <MenuContent className="w-60" side={variant === "card" ? "top" : "bottom"} align={variant === "card" ? "start" : "end"}>
         <div className="px-2.5 py-2">
-          <p className="text-[14px] font-semibold text-ink">{me?.display_name}</p>
-          <p className="truncate text-[13px] text-muted">{me?.email}</p>
+          <p className="text-[15.5px] font-semibold text-ink">{me?.display_name}</p>
+          <p className="truncate text-[14.5px] text-muted">{me?.email}</p>
         </div>
         <MenuSeparator />
         <MenuItem onSelect={() => router.push("/settings")}><Settings />Settings</MenuItem>
@@ -310,7 +310,7 @@ function ProfileMenu({ variant }: { variant: "avatar" | "card" }) {
 function DemoBanner() {
   return (
     <div className="mx-auto max-w-[1400px] px-4 pt-4 sm:px-6 lg:px-8">
-      <div className="flex items-center gap-3 rounded-2xl border border-dashed border-warn/40 bg-warn-soft px-4 py-2.5 text-[14px] text-ink-2">
+      <div className="flex items-center gap-3 rounded-2xl border border-dashed border-warn/40 bg-warn-soft px-4 py-2.5 text-[15.5px] text-ink-2">
         <Badge tone="warn">Demo data</Badge>
         <span className="min-w-0 truncate">You&apos;re viewing generated demonstration data — nothing here is real financial information.</span>
         <Link href="/accounts?add=1" className="ml-auto hidden shrink-0 font-medium text-accent-fg hover:underline sm:inline">Connect a real account</Link>
@@ -324,16 +324,16 @@ function BottomNav() {
   const router = useRouter();
   const more = NAV.filter((n) => !("mobile" in n && n.mobile));
   const moreActive = more.some((n) => isActive(pathname, n.href));
-  const item = "relative flex flex-col items-center justify-center gap-0.5 text-[11.5px] font-medium transition-colors duration-200";
+  const item = "relative flex flex-col items-center justify-center gap-0.5 text-[13px] font-medium transition-colors duration-200";
   return (
     <nav aria-label="Primary" className="fixed inset-x-3 bottom-3 z-30 lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div className="mx-auto grid h-[66px] max-w-lg grid-cols-5 gap-1 rounded-[26px] border border-white/60 bg-card/80 p-1.5 shadow-pop backdrop-blur-xl dark:border-white/5">
         {NAV.filter((n) => "mobile" in n && n.mobile).map((n) => {
           const active = isActive(pathname, n.href);
           return (
-            <Link key={n.href} href={n.href} aria-current={active ? "page" : undefined} className={cn(item, active ? "text-ink" : "text-muted")}>
+            <Link key={n.href} href={n.href} aria-label={n.label} aria-current={active ? "page" : undefined} className={cn(item, active ? "text-ink" : "text-muted")}>
               {active && <motion.span layoutId="bottom-active" className="absolute inset-0 rounded-[20px] bg-accent-soft" transition={SPRING} />}
-              <n.icon className="relative size-5" strokeWidth={1.75} aria-hidden /><span className="relative">{n.label}</span>
+              <n.icon className="relative size-5" strokeWidth={1.75} aria-hidden /><span className="relative">{"short" in n ? n.short : n.label}</span>
             </Link>
           );
         })}
@@ -344,7 +344,7 @@ function BottomNav() {
           <MenuContent side="top" className="mb-2 w-56">
             {more.map((n) => <MenuItem key={n.href} onSelect={() => router.push(n.href)}><n.icon />{n.label}</MenuItem>)}
             <MenuSeparator />
-            <div className="flex items-center justify-between px-2.5 py-1 text-[14px] text-ink-2">Theme <ThemeMenu /></div>
+            <div className="flex items-center justify-between px-2.5 py-1 text-[15.5px] text-ink-2">Theme <ThemeMenu /></div>
           </MenuContent>
         </Menu>
       </div>

@@ -68,7 +68,7 @@ export default function AccountsPage() {
 
       {groups.map((g) => (
         <section key={g.title} aria-labelledby={`g-${g.title}`}>
-          <h2 id={`g-${g.title}`} className="mb-3 text-[14px] font-semibold uppercase tracking-[0.06em] text-muted">{g.title}</h2>
+          <h2 id={`g-${g.title}`} className="mb-3 text-[15.5px] font-semibold uppercase tracking-[0.06em] text-muted">{g.title}</h2>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {g.items.map((a, i) => (
               <motion.div key={a.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
@@ -77,7 +77,7 @@ export default function AccountsPage() {
                     <InstitutionAvatar slug={a.institution_slug} name={a.institution} type={a.account_type} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold text-ink">{a.name}</p>
-                      <p className="truncate text-[13.5px] text-muted">{a.institution} · {ACCOUNT_TYPE_LABEL[a.account_type]}{a.masked_reference ? ` · ${a.masked_reference}` : ""}</p>
+                      <p className="truncate text-[15px] text-muted">{a.institution} · {ACCOUNT_TYPE_LABEL[a.account_type]}{a.masked_reference ? ` · ${a.masked_reference}` : ""}</p>
                     </div>
                     <Menu>
                       <MenuTrigger asChild><Button variant="ghost" size="icon-sm" aria-label={`Actions for ${a.name}`}><MoreHorizontal /></Button></MenuTrigger>
@@ -94,8 +94,8 @@ export default function AccountsPage() {
                   <div className="mt-5 flex items-end justify-between gap-3">
                     <div>
                       <p className="text-2xl font-semibold tracking-tight text-ink"><Money value={a.balance} currency={a.currency} /></p>
-                      {a.currency !== currency && <p className="mt-0.5 text-[13px] text-muted">≈ <Money value={a.balance_base} currency={currency} /></p>}
-                      {a.investments_value_local && <p className="mt-0.5 text-[13px] text-muted">Cash <Money value={a.cash_balance} currency={a.currency} /> · holdings included</p>}
+                      {a.currency !== currency && <p className="mt-0.5 text-[14.5px] text-muted">≈ <Money value={a.balance_base} currency={currency} /></p>}
+                      {a.investments_value_local && <p className="mt-0.5 text-[14.5px] text-muted">Cash <Money value={a.cash_balance} currency={a.currency} /> · holdings included</p>}
                     </div>
                     <Badge tone="outline">{a.currency}</Badge>
                   </div>
@@ -140,7 +140,7 @@ function RenameDialog({ account, onClose }: { account: AccountItem; onClose: () 
       <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
         <Field label="Nickname" htmlFor="nick" hint="Leave empty to use the institution's name"><Input id="nick" value={name} maxLength={120} onChange={(e) => setName(e.target.value)} placeholder={account.official_name} /></Field>
         <label className="flex items-center justify-between gap-4 rounded-xl border border-line p-3">
-          <span><span className="block text-sm font-medium text-ink">Include in net worth</span><span className="text-[13px] text-muted">Turn off if this balance is already represented elsewhere, to avoid double counting.</span></span>
+          <span><span className="block text-sm font-medium text-ink">Include in net worth</span><span className="text-[14.5px] text-muted">Turn off if this balance is already represented elsewhere, to avoid double counting.</span></span>
           <Switch checked={counts} onCheckedChange={setCounts} label="Include in net worth" />
         </label>
         <div className="flex justify-end gap-2"><Button type="button" onClick={onClose}>Cancel</Button><Button type="submit" variant="primary" loading={save.isPending}>Save</Button></div>
@@ -163,7 +163,7 @@ function DisconnectDialog({ account, onClose }: { account: AccountItem; onClose:
       <label className="flex items-start gap-3 rounded-xl border border-line p-3">
         <input type="checkbox" className="mt-1 size-4 accent-[var(--neg)]" checked={deleteData} onChange={(e) => setDeleteData(e.target.checked)} />
         <span><span className="block text-sm font-medium text-ink">Also delete imported history</span>
-          <span className="text-[13px] text-muted">Removes transactions, balances and holdings from this connection. This cannot be undone. By default your history is kept.</span></span>
+          <span className="text-[14.5px] text-muted">Removes transactions, balances and holdings from this connection. This cannot be undone. By default your history is kept.</span></span>
       </label>
       <div className="mt-5 flex justify-end gap-2"><Button onClick={onClose}>Cancel</Button><Button variant="danger" loading={go.isPending} onClick={() => go.mutate()}>Disconnect</Button></div>
     </Modal>
@@ -206,10 +206,10 @@ function AddAccountWizard({ open, onOpenChange }: { open: boolean; onOpenChange:
       <ol className="mb-6 flex items-center gap-2" aria-label="Progress">
         {steps.map((s, i) => (
           <li key={s} className="flex flex-1 items-center gap-2">
-            <span className={cn("grid size-6 shrink-0 place-items-center rounded-full text-[12px] font-semibold",
+            <span className={cn("grid size-6 shrink-0 place-items-center rounded-full text-[13.5px] font-semibold",
               step > i + 1 ? "bg-accent text-accent-ink" : step === i + 1 ? "bg-accent-soft text-accent-fg ring-1 ring-accent" : "bg-bg-subtle text-faint")}
               aria-current={step === i + 1 ? "step" : undefined}>{step > i + 1 ? "✓" : i + 1}</span>
-            <span className={cn("hidden text-[13px] sm:inline", step === i + 1 ? "font-medium text-ink" : "text-muted")}>{s}</span>
+            <span className={cn("hidden text-[14.5px] sm:inline", step === i + 1 ? "font-medium text-ink" : "text-muted")}>{s}</span>
             {i < steps.length - 1 && <span className="h-px flex-1 bg-line" />}
           </li>
         ))}
@@ -222,7 +222,7 @@ function AddAccountWizard({ open, onOpenChange }: { open: boolean; onOpenChange:
                 <button key={x.slug} onClick={() => { setInst(x); setStep(2); }}
                   className="flex items-center gap-3 hl rounded-2xl border border-line p-3.5 text-left hover:bg-accent-soft/40">
                   <InstitutionAvatar slug={x.slug} name={x.name} />
-                  <span className="flex-1"><span className="block font-medium text-ink">{x.name}</span><span className="text-[13.5px] text-muted">{x.kind}</span></span>
+                  <span className="flex-1"><span className="block font-medium text-ink">{x.name}</span><span className="text-[15px] text-muted">{x.kind}</span></span>
                 </button>
               ))}
             </div>
@@ -238,12 +238,12 @@ function AddAccountWizard({ open, onOpenChange }: { open: boolean; onOpenChange:
                     <span className="grid size-9 place-items-center rounded-xl bg-bg-subtle text-ink-2"><I className="size-4" /></span>
                     <span className="flex-1">
                       <span className="flex items-center gap-2 font-medium text-ink">{METHOD_INFO[m].title}{unavailable && <Badge tone="outline">Not configured</Badge>}</span>
-                      <span className="text-[13.5px] text-muted">{unavailable ? "Revolut Open Banking requires a regulated AISP or licensed aggregator. Use statement import instead." : METHOD_INFO[m].desc}</span>
+                      <span className="text-[15px] text-muted">{unavailable ? "Revolut Open Banking requires a regulated AISP or licensed aggregator. Use statement import instead." : METHOD_INFO[m].desc}</span>
                     </span>
                   </button>
                 );
               })}
-              {inst.slug === "groww" && <p className="rounded-xl bg-info-soft px-3 py-2 text-[13px] text-ink-2">Groww&apos;s Trade API covers stocks &amp; ETFs only. Mutual funds and FDs: <b>manual import available</b>.</p>}
+              {inst.slug === "groww" && <p className="rounded-xl bg-info-soft px-3 py-2 text-[14.5px] text-ink-2">Groww&apos;s Trade API covers stocks &amp; ETFs only. Mutual funds and FDs: <b>manual import available</b>.</p>}
               <Button variant="ghost" size="sm" className="justify-self-start" onClick={() => setStep(1)}>← Back</Button>
             </div>
           )}
@@ -255,7 +255,7 @@ function AddAccountWizard({ open, onOpenChange }: { open: boolean; onOpenChange:
             <div className="text-center">
               <div className="mx-auto grid size-14 place-items-center rounded-full bg-pos-soft text-pos"><CheckCircle2 className="size-7" /></div>
               <p className="mt-4 text-lg font-semibold text-ink">{result.title}</p>
-              <ul className="mt-2 space-y-1 text-[14px] text-muted">{result.lines.map((l) => <li key={l}>{l}</li>)}</ul>
+              <ul className="mt-2 space-y-1 text-[15.5px] text-muted">{result.lines.map((l) => <li key={l}>{l}</li>)}</ul>
               <Button variant="primary" className="mt-6" onClick={() => onOpenChange(false)}>Done</Button>
             </div>
           )}
@@ -294,14 +294,14 @@ function AuthorizeStep({ inst, method, connectors, onBack, onDone }: {
     const ok = required.every((f) => creds[f]?.trim()) && (inst.slug !== "groww" || creds.access_token || (creds.api_key && creds.totp_secret));
     return (
       <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); connect.mutate(real.key); }}>
-        <p className="text-[14px] text-muted">{real.notes}</p>
+        <p className="text-[15.5px] text-muted">{real.notes}</p>
         {real.credential_fields.map((f) => (
           <Field key={f} label={CRED_LABELS[f]?.label ?? f} hint={CRED_LABELS[f]?.hint} htmlFor={f}>
             <Input id={f} type={CRED_LABELS[f]?.secret ? "password" : "text"} autoComplete="off" spellCheck={false}
               value={creds[f] ?? ""} onChange={(e) => setCreds((c) => ({ ...c, [f]: e.target.value }))} />
           </Field>
         ))}
-        <p className="flex items-start gap-2 text-[13px] text-muted"><ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-accent-fg" />Credentials are validated with a live read-only request, then encrypted (AES-256-GCM). They are never shown again or sent to your browser.</p>
+        <p className="flex items-start gap-2 text-[14.5px] text-muted"><ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-accent-fg" />Credentials are validated with a live read-only request, then encrypted (AES-256-GCM). They are never shown again or sent to your browser.</p>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Button type="button" variant="ghost" size="sm" onClick={onBack}>← Back</Button>
           <div className="flex gap-2">
@@ -376,7 +376,7 @@ function ImportDialog({ account, onClose }: { account: AccountItem; onClose: () 
         <label className={cn("flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-line px-6 py-12 text-center transition-colors hover:border-accent", busy && "opacity-60")}>
           <Upload className="size-6 text-muted" />
           <span className="mt-3 text-sm font-medium text-ink">{busy ? "Validating…" : "Choose a CSV file"}</span>
-          <span className="mt-1 text-[13px] text-muted">Max 5 MB. Nothing is saved until you confirm the preview.</span>
+          <span className="mt-1 text-[14.5px] text-muted">Max 5 MB. Nothing is saved until you confirm the preview.</span>
           <input type="file" accept=".csv,text/csv" className="sr-only" disabled={busy} onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
         </label>
       ) : (
@@ -388,15 +388,15 @@ function ImportDialog({ account, onClose }: { account: AccountItem; onClose: () 
             <Stat label="To review">{preview.dedup.possible_duplicate}</Stat>
           </div>
           {preview.errors.length > 0 && (
-            <div className="rounded-xl bg-warn-soft p-3 text-[13.5px] text-ink-2">
+            <div className="rounded-xl bg-warn-soft p-3 text-[15px] text-ink-2">
               <p className="font-medium">{preview.errors.length} row(s) could not be read and will not be imported:</p>
               <ul className="mt-1 list-disc pl-5">{preview.errors.slice(0, 5).map((e) => <li key={e.row}>Row {e.row}: {e.error}</li>)}</ul>
             </div>
           )}
-          {preview.skipped > 0 && <p className="text-[13px] text-muted">{preview.skipped} declined/failed rows skipped.</p>}
-          {preview.currency_mismatch.length > 0 && <p className="text-[13px] text-warn">Contains {preview.currency_mismatch.join(", ")} rows — original currencies will be preserved.</p>}
+          {preview.skipped > 0 && <p className="text-[14.5px] text-muted">{preview.skipped} declined/failed rows skipped.</p>}
+          {preview.currency_mismatch.length > 0 && <p className="text-[14.5px] text-warn">Contains {preview.currency_mismatch.join(", ")} rows — original currencies will be preserved.</p>}
           <div className="max-h-64 overflow-auto rounded-xl border border-line">
-            <table className="w-full text-[13.5px]">
+            <table className="w-full text-[15px]">
               <thead className="sticky top-0 bg-bg-subtle text-left text-muted"><tr><th className="px-3 py-2 font-medium">Date</th><th className="px-3 py-2 font-medium">Description</th><th className="px-3 py-2 font-medium">Type</th><th className="px-3 py-2 text-right font-medium">Amount</th></tr></thead>
               <tbody className="divide-y divide-line">
                 {preview.sample.map((s, i) => (
@@ -440,7 +440,7 @@ function ManualAssets() {
                 <li key={a.id} className="flex items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-ink">{a.name}</p>
-                    <p className="text-[13px] text-muted">{a.type.replace("_", " ")} · valued {formatDate(a.valuation_date)}{a.notes ? ` · ${a.notes}` : ""}</p>
+                    <p className="text-[14.5px] text-muted">{a.type.replace("_", " ")} · valued {formatDate(a.valuation_date)}{a.notes ? ` · ${a.notes}` : ""}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-ink"><Money value={a.value} currency={a.currency} /></p>
@@ -462,11 +462,11 @@ function ManualAssets() {
                 <li key={l.id} className="flex items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-ink">{l.name}</p>
-                    <p className="text-[13px] text-muted">{l.interest_rate ? `${Number(l.interest_rate)}% APR · ` : ""}{l.payment_amount ? `${formatMoney(l.payment_amount, l.currency)} / month · ` : ""}as of {formatDate(l.as_of)}</p>
+                    <p className="text-[14.5px] text-muted">{l.interest_rate ? `${Number(l.interest_rate)}% APR · ` : ""}{l.payment_amount ? `${formatMoney(l.payment_amount, l.currency)} / month · ` : ""}as of {formatDate(l.as_of)}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-ink"><Money value={l.outstanding} currency={l.currency} /></p>
-                    {l.currency !== currency && <p className="text-[12.5px] text-muted">≈ <Money value={l.outstanding_base} currency={currency} /></p>}
+                    {l.currency !== currency && <p className="text-[14px] text-muted">≈ <Money value={l.outstanding_base} currency={currency} /></p>}
                   </div>
                   <Button variant="ghost" size="icon-sm" aria-label={`Update balance of ${l.name}`} onClick={() => setEditing({ kind: "liability", id: l.id, name: l.name })}><Pencil /></Button>
                 </li>

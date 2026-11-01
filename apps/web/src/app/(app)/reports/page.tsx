@@ -40,14 +40,14 @@ export default function ReportsPage() {
       <Card className="flex flex-wrap items-end gap-4 p-5">
         <div className="w-44"><Field label="From (optional)" htmlFor="rf"><Input id="rf" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field></div>
         <div className="w-44"><Field label="To (optional)" htmlFor="rt"><Input id="rt" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field></div>
-        <p className="pb-2 text-[13.5px] text-muted">Leave empty to use each report&apos;s default period.</p>
+        <p className="pb-2 text-[15px] text-muted">Leave empty to use each report&apos;s default period.</p>
       </Card>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {REPORTS.map((r) => (
           <Card key={r.kind} className="flex flex-col p-5">
             <div className="flex items-start gap-3">
               <span className="grid size-10 place-items-center rounded-2xl bg-accent-soft text-accent-fg"><r.icon className="size-5" /></span>
-              <div><p className="font-semibold text-ink">{r.title}</p><p className="mt-0.5 text-[13.5px] text-muted">{r.desc}</p></div>
+              <div><p className="font-semibold text-ink">{r.title}</p><p className="mt-0.5 text-[15px] text-muted">{r.desc}</p></div>
             </div>
             <div className="mt-5 flex gap-2 pt-1">
               <Button size="sm" variant="primary" loading={busy === `${r.kind}-pdf`} onClick={() => download(r.kind, "pdf")}><FileText />PDF</Button>
@@ -57,7 +57,7 @@ export default function ReportsPage() {
           </Card>
         ))}
       </div>
-      <p className="text-[13px] text-faint">Exports never include API tokens, credentials or full account numbers. Each export is recorded in your security activity.</p>
+      <p className="text-[14.5px] text-faint">Exports never include API tokens, credentials or full account numbers. Each export is recorded in your security activity.</p>
     </div>
   );
 }
