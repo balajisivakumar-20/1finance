@@ -368,6 +368,7 @@ class GoalContribution(Base):
     amount: Mapped[Decimal] = mapped_column(Money)
     currency: Mapped[str] = mapped_column(String(3))
     contribution_date: Mapped[date] = mapped_column(Date)
+    note: Mapped[str | None] = mapped_column(String(200))
 
 
 class FinancialSnapshot(Base):

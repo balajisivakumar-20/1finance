@@ -113,10 +113,11 @@ def goals(user: User = Depends(current_user), db: Session = Depends(get_db)):
     for g in db.scalars(select(Goal).where(Goal.user_id == user.id).order_by(Goal.created_at)):
         contribs = list(db.scalars(select(GoalContribution).where(GoalContribution.goal_id == g.id).order_by(GoalContribution.contribution_date)))
         cur = ZERO
-        series = []
+        series, entries = [], []
         for c in contribs:
             cur += to_base(fx, c.amount, c.currency, g.target_currency, datetime.now(timezone.utc)) or ZERO
             series.append({"date": c.contribution_date, "amount": m(cur, g.target_currency)})
+            entries.append({"id": c.id, "date": c.contribution_date, "amount": m(c.amount, c.currency), "currency": c.currency, "note": c.note})
         if g.linked_account_id:
             linked.setdefault(g.linked_account_id, []).append(g.goal_name)
         remaining = max(g.target_amount - cur, ZERO)
@@ -131,7 +132,7 @@ def goals(user: User = Depends(current_user), db: Session = Depends(get_db)):
                     "remaining": m(remaining, g.target_currency), "progress_pct": pct(min(cur / g.target_amount * 100, Decimal(100))),
                     "monthly_plan": m(g.monthly_contribution_plan, g.target_currency), "estimated_completion": eta,
                     "on_track": None if not (eta and g.target_date) else eta <= g.target_date,
-                    "linked_account_id": g.linked_account_id, "history": series})
+                    "linked_account_id": g.linked_account_id, "history": series, "contributions": entries[::-1]})
     overlaps = [{"account_id": k, "goals": v} for k, v in linked.items() if len(v) > 1]
     return {"items": out, "overlaps": overlaps}
 
@@ -146,12 +147,31 @@ class GoalIn(BaseModel):
     linked_account_id: int | None = None
 
 
-@router.post("/goals", status_code=201)
-def create_goal(body: GoalIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    if body.linked_account_id:
-        a = db.get(Account, body.linked_account_id)
+def _check_account(db: Session, user: User, account_id: int | None) -> None:
+    if account_id:
+        a = db.get(Account, account_id)
         if not a or a.user_id != user.id:
             raise HTTPException(422, "Unknown account")
+
+
+def _own_goal(db: Session, user: User, gid: int) -> Goal:
+    g = db.get(Goal, gid)
+    if not g or g.user_id != user.id:
+        raise HTTPException(404, "Goal not found")
+    return g
+
+
+def _own_contribution(db: Session, user: User, gid: int, cid: int) -> GoalContribution:
+    _own_goal(db, user, gid)
+    c = db.get(GoalContribution, cid)
+    if not c or c.goal_id != gid:
+        raise HTTPException(404, "Contribution not found")
+    return c
+
+
+@router.post("/goals", status_code=201)
+def create_goal(body: GoalIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    _check_account(db, user, body.linked_account_id)
     g = Goal(user_id=user.id, goal_name=body.name, goal_type=body.goal_type, target_amount=body.target_amount,
              target_currency=body.currency.upper(), target_date=body.target_date, monthly_contribution_plan=body.monthly_plan,
              linked_account_id=body.linked_account_id)
@@ -160,26 +180,89 @@ def create_goal(body: GoalIn, user: User = Depends(current_user), db: Session = 
     return {"id": g.id}
 
 
+class GoalPatch(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=120)
+    goal_type: str | None = None
+    target_amount: Decimal | None = Field(default=None, gt=0)
+    currency: str | None = Field(default=None, min_length=3, max_length=3)
+    target_date: date | None = None
+    monthly_plan: Decimal | None = Field(default=None, ge=0)
+    linked_account_id: int | None = None
+
+
+@router.patch("/goals/{gid}")
+def update_goal(gid: int, body: GoalPatch, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    g = _own_goal(db, user, gid)
+    sent = body.model_fields_set
+    if "name" in sent and body.name:
+        g.goal_name = body.name
+    if "goal_type" in sent and body.goal_type:
+        g.goal_type = body.goal_type
+    if "target_amount" in sent and body.target_amount:
+        g.target_amount = body.target_amount
+    if "currency" in sent and body.currency and body.currency.upper() != g.target_currency:
+        # Amounts are logged by hand in the goal's currency, so a currency change relabels them rather than converting.
+        g.target_currency = body.currency.upper()
+        for c in db.scalars(select(GoalContribution).where(GoalContribution.goal_id == g.id)):
+            c.currency = g.target_currency
+    if "target_date" in sent:
+        g.target_date = body.target_date
+    if "monthly_plan" in sent:
+        g.monthly_contribution_plan = body.monthly_plan
+    if "linked_account_id" in sent:
+        _check_account(db, user, body.linked_account_id)
+        g.linked_account_id = body.linked_account_id
+    return {"ok": True}
+
+
 class ContributionIn(BaseModel):
     amount: Decimal
     on: date | None = None
+    note: str | None = Field(default=None, max_length=200)
 
 
 @router.post("/goals/{gid}/contributions", status_code=201)
 def contribute(gid: int, body: ContributionIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    g = db.get(Goal, gid)
-    if not g or g.user_id != user.id:
-        raise HTTPException(404, "Goal not found")
-    db.add(GoalContribution(goal_id=g.id, amount=body.amount, currency=g.target_currency, contribution_date=body.on or _today()))
+    g = _own_goal(db, user, gid)
+    if body.amount == 0:
+        raise HTTPException(422, "Amount cannot be zero")
+    c = GoalContribution(goal_id=g.id, amount=body.amount, currency=g.target_currency, contribution_date=body.on or _today(),
+                         note=body.note or None)
+    db.add(c)
+    db.flush()
+    return {"id": c.id}
+
+
+class ContributionPatch(BaseModel):
+    amount: Decimal | None = None
+    on: date | None = None
+    note: str | None = Field(default=None, max_length=200)
+
+
+@router.patch("/goals/{gid}/contributions/{cid}")
+def update_contribution(gid: int, cid: int, body: ContributionPatch, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    c = _own_contribution(db, user, gid, cid)
+    sent = body.model_fields_set
+    if "amount" in sent and body.amount is not None:
+        if body.amount == 0:
+            raise HTTPException(422, "Amount cannot be zero")
+        c.amount = body.amount
+    if "on" in sent and body.on:
+        c.contribution_date = body.on
+    if "note" in sent:
+        c.note = body.note or None
+    return {"ok": True}
+
+
+@router.delete("/goals/{gid}/contributions/{cid}")
+def delete_contribution(gid: int, cid: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    db.delete(_own_contribution(db, user, gid, cid))
     return {"ok": True}
 
 
 @router.delete("/goals/{gid}")
 def delete_goal(gid: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    g = db.get(Goal, gid)
-    if not g or g.user_id != user.id:
-        raise HTTPException(404, "Goal not found")
-    db.delete(g)
+    db.delete(_own_goal(db, user, gid))
     return {"ok": True}
 
 
