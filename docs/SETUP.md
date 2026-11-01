@@ -44,6 +44,12 @@ npm run dev                         # http://localhost:3000 (proxies /api → :8
 | Type check / lint | `cd apps/web && npm run typecheck && npm run lint` | |
 | End-to-end, desktop + mobile (15 tests) | `cd apps/web && npx playwright test` | needs API (demo mode) + web running |
 
+## Google sign-in (local)
+
+Create an OAuth client as described in [DEPLOY.md](DEPLOY.md#2-create-the-google-oauth-client) with the redirect URI
+`http://localhost:3000/api/v1/auth/google/callback`, then set `ONEFINANCE_GOOGLE_CLIENT_ID` and
+`ONEFINANCE_GOOGLE_CLIENT_SECRET` in `apps/api/.env` and restart the API. The login page then shows **Continue with Google**.
+
 ## Connecting real accounts
 
 All integrations are **read-only**. Credentials are validated with a live request, encrypted with AES-256-GCM and
@@ -66,6 +72,9 @@ Accounts → Add account → Other/Revolut → Statement import (or "Import stat
 To enable live sync later, implement `AggregatorConnector` with a licensed provider (GoCardless Bank Account Data, TrueLayer, Tink).
 
 ## Production checklist
+
+Step-by-step public deployment (single server, HTTPS, Google sign-in): see [DEPLOY.md](DEPLOY.md).
+
 
 - `ONEFINANCE_ENV=production`, `ONEFINANCE_DEMO_MODE=false`, `ONEFINANCE_ALLOW_MOCK_CONNECTORS=false` (the API refuses to start otherwise)
 - `ONEFINANCE_CREDENTIAL_KEY` from a secret manager (KMS / Vault / Docker secrets); rotate by re-encrypting `encrypted_credentials`

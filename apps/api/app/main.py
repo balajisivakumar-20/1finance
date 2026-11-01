@@ -63,7 +63,7 @@ async def unhandled(_: Request, exc: Exception):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "env": s.env, "demo_mode": s.demo_mode}
+    return {"status": "ok", "env": s.env, "demo_mode": s.demo_mode, "google_enabled": s.google_enabled}
 
 
 for r in (auth, overview, accounts, transactions, investments, planning, settings):

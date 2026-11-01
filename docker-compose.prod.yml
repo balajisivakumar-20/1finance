@@ -1,0 +1,63 @@
+# Production stack for a single server. Caddy terminates HTTPS (automatic Let's Encrypt certificates) for $DOMAIN
+# and routes /api/* to the API and everything else to the web app. Only ports 80 and 443 are exposed.
+#
+#   cp .env.production.example .env.production   # then fill it in
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+#
+# See docs/DEPLOY.md.
+x-api-env: &api-env
+  ONEFINANCE_ENV: production
+  ONEFINANCE_DEMO_MODE: "false"
+  ONEFINANCE_ALLOW_MOCK_CONNECTORS: "false"
+  ONEFINANCE_COOKIE_SECURE: "true"
+  ONEFINANCE_PUBLIC_URL: https://${DOMAIN:?set DOMAIN}
+  ONEFINANCE_CORS_ORIGINS: '["https://${DOMAIN}"]'
+  ONEFINANCE_DATABASE_URL: postgresql+psycopg://onefinance:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/onefinance
+  ONEFINANCE_REDIS_URL: redis://redis:6379/0
+  ONEFINANCE_CREDENTIAL_KEY: ${CREDENTIAL_KEY:?set CREDENTIAL_KEY}
+  ONEFINANCE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?set GOOGLE_CLIENT_ID}
+  ONEFINANCE_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?set GOOGLE_CLIENT_SECRET}
+  ONEFINANCE_BASE_CURRENCY_DEFAULT: ${BASE_CURRENCY:-EUR}
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment: { POSTGRES_USER: onefinance, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}", POSTGRES_DB: onefinance }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD", "pg_isready", "-U", "onefinance"], interval: 5s, retries: 10 }
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+  api:
+    build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
+    restart: unless-stopped
+    environment:
+      <<: *api-env
+      FORWARDED_ALLOW_IPS: "*"  # trust X-Forwarded-For from Caddy; the API is not reachable from outside
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_started } }
+  worker:
+    build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
+    restart: unless-stopped
+    command: celery -A app.worker worker -B --loglevel=info
+    environment: *api-env
+    depends_on: [api]
+  web:
+    build: { context: ., dockerfile: infrastructure/docker/web.Dockerfile, args: { ONEFINANCE_API_URL: "http://api:8000" } }
+    restart: unless-stopped
+    environment: { ONEFINANCE_API_URL: "http://api:8000" }
+    depends_on: [api]
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment: { DOMAIN: "${DOMAIN}" }
+    volumes:
+      - ./infrastructure/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [web, api]
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

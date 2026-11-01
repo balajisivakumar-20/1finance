@@ -202,12 +202,12 @@ function AddAccountWizard({ open, onOpenChange }: { open: boolean; onOpenChange:
   const steps = ["Institution", "Method", "Authorize", "Confirm"];
   return (
     <Modal open={open} onOpenChange={onOpenChange} title="Add an account" className="max-w-xl"
-      description={<span className="inline-flex items-center gap-1.5"><ShieldCheck className="size-3.5 text-accent" />Read-only access. 1Finance never stores bank passwords or moves money.</span>}>
+      description={<span className="inline-flex items-center gap-1.5"><ShieldCheck className="size-3.5 text-accent-fg" />Read-only access. 1Finance never stores bank passwords or moves money.</span>}>
       <ol className="mb-6 flex items-center gap-2" aria-label="Progress">
         {steps.map((s, i) => (
           <li key={s} className="flex flex-1 items-center gap-2">
             <span className={cn("grid size-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold",
-              step > i + 1 ? "bg-accent text-accent-ink" : step === i + 1 ? "bg-accent-soft text-accent ring-1 ring-accent" : "bg-bg-subtle text-faint")}
+              step > i + 1 ? "bg-accent text-accent-ink" : step === i + 1 ? "bg-accent-soft text-accent-fg ring-1 ring-accent" : "bg-bg-subtle text-faint")}
               aria-current={step === i + 1 ? "step" : undefined}>{step > i + 1 ? "✓" : i + 1}</span>
             <span className={cn("hidden text-[12px] sm:inline", step === i + 1 ? "font-medium text-ink" : "text-muted")}>{s}</span>
             {i < steps.length - 1 && <span className="h-px flex-1 bg-line" />}
@@ -301,7 +301,7 @@ function AuthorizeStep({ inst, method, connectors, onBack, onDone }: {
               value={creds[f] ?? ""} onChange={(e) => setCreds((c) => ({ ...c, [f]: e.target.value }))} />
           </Field>
         ))}
-        <p className="flex items-start gap-2 text-[12px] text-muted"><ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-accent" />Credentials are validated with a live read-only request, then encrypted (AES-256-GCM). They are never shown again or sent to your browser.</p>
+        <p className="flex items-start gap-2 text-[12px] text-muted"><ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-accent-fg" />Credentials are validated with a live read-only request, then encrypted (AES-256-GCM). They are never shown again or sent to your browser.</p>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Button type="button" variant="ghost" size="sm" onClick={onBack}>← Back</Button>
           <div className="flex gap-2">
