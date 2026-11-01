@@ -29,14 +29,14 @@ export default function OverviewPage() {
     <div className="space-y-5 lg:space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[13px] text-muted">{now ? format(now, "EEEE, d MMMM yyyy") : " "}</p>
-          <h1 className="mt-1 text-[30px] font-semibold leading-tight tracking-tight text-ink sm:text-[42px]">
+          <p className="text-[14px] text-muted">{now ? format(now, "EEEE, d MMMM yyyy") : " "}</p>
+          <h1 className="mt-1 text-[31px] font-semibold leading-tight tracking-tight text-ink sm:text-[43px]">
             {now ? greeting(now) : "Hello"}{me?.display_name ? `, ${me.display_name.split(" ")[0]}` : ""}
           </h1>
-          <p className="mt-0.5 text-[15px] text-muted">Here&apos;s your financial overview.</p>
+          <p className="mt-0.5 text-[16px] text-muted">Here&apos;s your financial overview.</p>
         </div>
         {summary.data && (
-          <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted">
+          <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted">
             {summary.data.data_quality.includes_estimates && <Tip content="Includes manually estimated asset values"><Badge tone="outline">Includes estimates</Badge></Tip>}
             {summary.data.data_quality.price_types.includes("delayed") && <Tip content="Security prices may be delayed by 15+ minutes"><Badge tone="outline">Delayed prices</Badge></Tip>}
             {summary.data.fx && <Tip content={`Converted with ${summary.data.fx.provider.toUpperCase()} rates as of ${formatDate(summary.data.fx.as_of)}`}><Badge tone="outline">FX: {summary.data.fx.provider.toUpperCase()}</Badge></Tip>}
@@ -81,13 +81,13 @@ function NetWorthHero() {
       <Card className="overflow-hidden">
         <div className="flex flex-col gap-4 px-5 pt-5 sm:flex-row sm:items-start sm:justify-between sm:px-7 sm:pt-6">
           <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">Total net worth</p>
+            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-muted">Total net worth</p>
             {summary.isLoading ? <Skeleton className="mt-2 h-11 w-64" /> : summary.isError ? <p className="mt-2 text-sm text-neg">Unavailable</p> : (
               <>
-                <p className="mt-1.5 text-[38px] font-semibold leading-none tracking-tight text-ink tabular sm:text-[44px]" aria-live="polite">
+                <p className="mt-1.5 text-[39px] font-semibold leading-none tracking-tight text-ink tabular sm:text-[45px]" aria-live="polite">
                   <Money value={hover?.value ?? last} currency={currency} />
                 </p>
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px] text-muted">
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-[14px] text-muted">
                   {hover ? <span>{formatDate(hover.date, "EEE, d MMM yyyy")}</span> : (
                     <><Change pct={changePct} amount={changeAbs} currency={currency} label={rangeLabel} /><span>{rangeLabel}</span></>
                   )}
@@ -125,7 +125,7 @@ function SummaryCards() {
         <motion.div key={c.title} {...fade} transition={{ ...fade.transition, delay: 0.04 * i }}>
           <Card className="group h-full p-4 transition-shadow hover:shadow-pop sm:p-5">
             <div className="flex items-center justify-between">
-              <p className="text-[12.5px] font-medium text-muted">{c.title}</p>
+              <p className="text-[13.5px] font-medium text-muted">{c.title}</p>
               <span className={cn("grid size-8 place-items-center rounded-xl",
                 c.tone === "accent" ? "bg-accent-soft text-accent-fg" : c.tone === "pos" ? "bg-pos-soft text-pos" : c.tone === "warn" ? "bg-warn-soft text-warn" : "bg-bg-subtle text-ink-2")}>
                 <c.icon className="size-4" aria-hidden />
@@ -133,7 +133,7 @@ function SummaryCards() {
             </div>
             <p className="mt-2.5 text-xl font-semibold tracking-tight text-ink tabular sm:text-2xl"><Money value={c.value} currency={currency} /></p>
             <div className="mt-2 flex min-h-5 flex-wrap items-center gap-1.5">{c.change}</div>
-            <p className="mt-1.5 text-[11.5px] text-faint">{c.note}</p>
+            <p className="mt-1.5 text-[12.5px] text-faint">{c.note}</p>
           </Card>
         </motion.div>
       ))}
@@ -159,7 +159,7 @@ function WealthOverTime({ className }: { className?: string }) {
         <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Series">
           {series.map((s) => (
             <button key={s.key} aria-pressed={s.on} onClick={() => setOn((o) => ({ ...o, [s.key]: !o[s.key] }))}
-              className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[12px] font-medium transition-colors",
+              className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[13px] font-medium transition-colors",
                 s.on ? "border-line bg-card text-ink" : "border-dashed border-line text-faint")}>
               <span className="size-2 rounded-full" style={{ background: s.on ? s.color : "var(--line-strong)" }} />{s.label}
             </button>
@@ -193,7 +193,7 @@ function Allocation({ className }: { className?: string }) {
               {rows.map((r) => (
                 <li key={r.key}>
                   <button onClick={() => setSelected(selected === r.key ? null : r.key)} aria-pressed={selected === r.key}
-                    className={cn("flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-left text-[13px] transition-colors hover:bg-bg-subtle", selected === r.key && "bg-bg-subtle")}>
+                    className={cn("flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-left text-[14px] transition-colors hover:bg-bg-subtle", selected === r.key && "bg-bg-subtle")}>
                     <span className="size-2.5 shrink-0 rounded-full" style={{ background: r.color }} aria-hidden />
                     <span className="min-w-0 flex-1 truncate text-ink-2">{r.label}</span>
                     <span className="w-12 text-right text-muted tabular">{formatPct(r.share, { decimals: 1 })}</span>
@@ -203,7 +203,7 @@ function Allocation({ className }: { className?: string }) {
               ))}
             </ul>
             {selected && (
-              <Link href={ALLOC_LINK[selected] ?? "/accounts"} className="mt-3 flex items-center justify-center gap-1 text-[13px] font-medium text-accent-fg hover:underline">
+              <Link href={ALLOC_LINK[selected] ?? "/accounts"} className="mt-3 flex items-center justify-center gap-1 text-[14px] font-medium text-accent-fg hover:underline">
                 View {rows.find((r) => r.key === selected)?.label.toLowerCase()} <ArrowRight className="size-3.5" />
               </Link>
             )}
@@ -230,13 +230,13 @@ function AccountsCard({ className }: { className?: string }) {
             <li key={a.id} className="flex items-center gap-3 px-2 py-3">
               <InstitutionAvatar slug={a.institution_slug} name={a.institution} type={a.account_type} />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[14px] font-medium text-ink">{a.name}</p>
-                <p className="truncate text-[12px] text-muted">{a.institution} · {ACCOUNT_TYPE_LABEL[a.account_type] ?? a.account_type}{a.masked_reference ? ` · ${a.masked_reference}` : ""}</p>
+                <p className="truncate text-[15px] font-medium text-ink">{a.name}</p>
+                <p className="truncate text-[13px] text-muted">{a.institution} · {ACCOUNT_TYPE_LABEL[a.account_type] ?? a.account_type}{a.masked_reference ? ` · ${a.masked_reference}` : ""}</p>
               </div>
               <div className="text-right">
-                <p className="text-[14px] font-semibold text-ink"><Money value={a.balance} currency={a.currency} /></p>
+                <p className="text-[15px] font-semibold text-ink"><Money value={a.balance} currency={a.currency} /></p>
                 <div className="mt-0.5 flex justify-end">
-                  {a.currency !== currency ? <span className="text-[11.5px] text-muted">≈ <Money value={a.balance_base} currency={currency} /></span>
+                  {a.currency !== currency ? <span className="text-[12.5px] text-muted">≈ <Money value={a.balance_base} currency={currency} /></span>
                     : <ConnectionStatus status={a.connection_status} lastSync={a.last_sync} stale={a.is_stale} />}
                 </div>
               </div>
@@ -271,7 +271,7 @@ function SpendingCard({ className }: { className?: string }) {
                 <li key={c.slug} className="flex items-center gap-3">
                   <CategoryIcon icon={c.icon} color={c.color} size="sm" />
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2 text-[13px]">
+                    <div className="flex items-baseline justify-between gap-2 text-[14px]">
                       <span className="truncate font-medium text-ink">{c.name}</span>
                       <span className="font-medium text-ink"><Money value={c.amount} currency={currency} /></span>
                     </div>
@@ -280,7 +280,7 @@ function SpendingCard({ className }: { className?: string }) {
                         initial={{ width: 0 }} animate={{ width: `${Math.max(2, Number(c.share))}%` }} transition={{ duration: 0.6, ease: "easeOut" }} />
                     </div>
                   </div>
-                  <span className="w-11 text-right text-[12px] text-muted tabular">{formatPct(c.share, { decimals: 0 })}</span>
+                  <span className="w-11 text-right text-[13px] text-muted tabular">{formatPct(c.share, { decimals: 0 })}</span>
                 </li>
               ))}
             </ul>
@@ -313,17 +313,17 @@ function RecentTransactions({ className }: { className?: string }) {
                 <Link href={`/transactions?id=${t.id}`} className="flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-bg-subtle">
                   <CategoryIcon icon={t.category?.icon} color={t.category?.color} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14px] font-medium text-ink">{t.merchant ?? t.description}</p>
-                    <p className="truncate text-[12px] text-muted">{t.category?.name ?? "Uncategorized"} · {t.account?.name} · {relativeDay(t.date)}</p>
+                    <p className="truncate text-[15px] font-medium text-ink">{t.merchant ?? t.description}</p>
+                    <p className="truncate text-[13px] text-muted">{t.category?.name ?? "Uncategorized"} · {t.account?.name} · {relativeDay(t.date)}</p>
                   </div>
                   <div className="text-right">
-                    <p className={cn("text-[14px] font-semibold tabular", inflow ? "text-pos" : "text-ink")}>
+                    <p className={cn("text-[15px] font-semibold tabular", inflow ? "text-pos" : "text-ink")}>
                       <Money value={t.amount} currency={t.currency} signed={inflow} />
                     </p>
                     <div className="mt-0.5 flex justify-end gap-1">
                       {t.status === "pending" && <Badge tone="warn">Pending</Badge>}
                       {t.type === "transfer" && <Badge tone="outline">Transfer</Badge>}
-                      {t.currency !== currency && t.amount_base && <span className="text-[11px] text-muted">≈ <Money value={t.amount_base} currency={currency} /></span>}
+                      {t.currency !== currency && t.amount_base && <span className="text-[12px] text-muted">≈ <Money value={t.amount_base} currency={currency} /></span>}
                     </div>
                   </div>
                 </Link>
@@ -359,10 +359,10 @@ function Insights({ className }: { className?: string }) {
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-[13.5px] font-medium text-ink">{it.title}</p>
-                  {v != null && it.unit !== "percent" && <span className="text-[13px] font-semibold text-ink"><Money value={v} currency={currency} /></span>}
+                  <p className="text-[14.5px] font-medium text-ink">{it.title}</p>
+                  {v != null && it.unit !== "percent" && <span className="text-[14px] font-semibold text-ink"><Money value={v} currency={currency} /></span>}
                 </div>
-                <p className="mt-0.5 text-[12px] leading-relaxed text-muted">{it.body}</p>
+                <p className="mt-0.5 text-[13px] leading-relaxed text-muted">{it.body}</p>
               </div>
             </div>
           );

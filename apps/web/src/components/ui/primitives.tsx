@@ -19,7 +19,7 @@ const buttonVariants = cva(
         danger: "bg-neg text-white hover:opacity-90",
         link: "text-accent-fg underline-offset-4 hover:underline px-0 h-auto",
       },
-      size: { sm: "h-8 px-3.5 text-[13px]", md: "h-10 px-5", lg: "h-12 px-6 text-[15px]", icon: "size-10", "icon-sm": "size-8" },
+      size: { sm: "h-8 px-3.5 text-[14px]", md: "h-10 px-5", lg: "h-12 px-6 text-[16px]", icon: "size-10", "icon-sm": "size-8" },
     },
     defaultVariants: { variant: "secondary", size: "md" },
   },
@@ -48,8 +48,8 @@ export function CardHeader({ title, description, action, className }: { title: R
   return (
     <div className={cn("flex flex-wrap items-start justify-between gap-3 px-5 pt-5 sm:px-6", className)}>
       <div className="min-w-0">
-        <h2 className="text-[17px] font-semibold tracking-tight text-ink">{title}</h2>
-        {description && <p className="mt-0.5 text-[13px] text-muted">{description}</p>}
+        <h2 className="text-[18px] font-semibold tracking-tight text-ink">{title}</h2>
+        {description && <p className="mt-0.5 text-[14px] text-muted">{description}</p>}
       </div>
       {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}
     </div>
@@ -60,7 +60,7 @@ export function CardBody({ className, ...p }: React.HTMLAttributes<HTMLDivElemen
 }
 
 // ---------------- Badge ----------------
-const badgeVariants = cva("inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium leading-4 [&_svg]:size-3", {
+const badgeVariants = cva("inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[12px] font-medium leading-4 [&_svg]:size-3", {
   variants: {
     tone: {
       neutral: "bg-bg-subtle text-ink-2",
@@ -90,7 +90,7 @@ export function EmptyState({ icon: Icon = Inbox, title, description, action, cla
     <div className={cn("flex flex-col items-center justify-center px-6 py-12 text-center", className)}>
       <div className="mb-3 grid size-11 place-items-center rounded-2xl bg-bg-subtle text-muted"><Icon className="size-5" aria-hidden /></div>
       <p className="text-sm font-medium text-ink">{title}</p>
-      {description && <p className="mt-1 max-w-sm text-[13px] text-muted">{description}</p>}
+      {description && <p className="mt-1 max-w-sm text-[14px] text-muted">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
@@ -102,7 +102,7 @@ export function ErrorState({ error, retry, className }: { error: unknown; retry?
     <div role="alert" className={cn("flex flex-col items-center justify-center px-6 py-10 text-center", className)}>
       <div className="mb-3 grid size-11 place-items-center rounded-2xl bg-neg-soft text-neg"><AlertTriangle className="size-5" aria-hidden /></div>
       <p className="text-sm font-medium text-ink">Couldn&apos;t load this section</p>
-      <p className="mt-1 max-w-sm text-[13px] text-muted">{msg}</p>
+      <p className="mt-1 max-w-sm text-[14px] text-muted">{msg}</p>
       {retry && <Button size="sm" className="mt-4" onClick={retry}><RotateCw />Try again</Button>}
     </div>
   );
@@ -129,7 +129,7 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
       {options.map((o) => (
         <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)}
           className={cn("rounded-full font-medium text-muted transition-all duration-200 hover:text-ink",
-            size === "sm" ? "h-7 px-2.5 text-xs" : "h-8 px-3 text-[13px]",
+            size === "sm" ? "h-7 px-2.5 text-xs" : "h-8 px-3 text-[14px]",
             value === o.value && "bg-card text-ink shadow-[0_1px_2px_rgba(0,0,0,0.06),0_4px_10px_-4px_rgba(40,30,10,0.18)]")}>
           {o.label}
         </button>
@@ -151,7 +151,7 @@ export const NativeSelect = React.forwardRef<HTMLSelectElement, React.SelectHTML
 NativeSelect.displayName = "NativeSelect";
 
 export function Label({ className, ...p }: React.LabelHTMLAttributes<HTMLLabelElement>) {
-  return <label className={cn("mb-1.5 block text-[13px] font-medium text-ink-2", className)} {...p} />;
+  return <label className={cn("mb-1.5 block text-[14px] font-medium text-ink-2", className)} {...p} />;
 }
 
 export function Field({ label, hint, error, children, htmlFor }: { label: string; hint?: string; error?: string; children: React.ReactNode; htmlFor?: string }) {
@@ -176,9 +176,9 @@ export function Switch({ checked, onCheckedChange, label, id }: { checked: boole
 export function Stat({ label, children, sub, className }: { label: string; children: React.ReactNode; sub?: React.ReactNode; className?: string }) {
   return (
     <div className={className}>
-      <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-muted">{label}</p>
+      <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-muted">{label}</p>
       <div className="mt-1.5 text-xl font-semibold tracking-tight text-ink tabular">{children}</div>
-      {sub && <div className="mt-1 text-[12px] text-muted">{sub}</div>}
+      {sub && <div className="mt-1 text-[13px] text-muted">{sub}</div>}
     </div>
   );
 }

@@ -98,6 +98,18 @@
   --chart-grid: #1c242e;
 }
 
+/* Type scale: Tailwind's defaults + 1px (xs 12→13 … 4xl 36→37). Line heights keep Tailwind's ratios. */
+@theme {
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.3125rem;
+  --text-2xl: 1.5625rem;
+  --text-3xl: 1.9375rem;
+  --text-4xl: 2.3125rem;
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-bg-subtle: var(--bg-subtle);
@@ -147,6 +159,7 @@
 
 html { -webkit-text-size-adjust: 100%; }
 body {
+  font-size: 1.0625rem; /* 17px: browser default + 1px for text without an explicit size */
   background: var(--page-glow), var(--bg);
   background-attachment: fixed;
   color: var(--ink);

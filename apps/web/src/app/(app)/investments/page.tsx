@@ -68,11 +68,11 @@ export default function InvestmentsPage() {
       <Card>
         <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1.2fr_2fr]">
           <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-muted">Total investment value</p>
+            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-muted">Total investment value</p>
             {summary.isLoading ? <Skeleton className="mt-2 h-10 w-52" /> : summary.isError ? <ErrorState error={summary.error} /> : s && (
               <>
                 <p className="mt-1.5 text-4xl font-semibold tracking-tight text-ink"><Money value={s.total_value} currency={currency} /></p>
-                <div className="mt-2 flex flex-wrap items-center gap-2"><Change amount={s.unrealized} pct={s.unrealized_pct} currency={currency} label="unrealized" /><span className="text-[13px] text-muted">unrealized</span></div>
+                <div className="mt-2 flex flex-wrap items-center gap-2"><Change amount={s.unrealized} pct={s.unrealized_pct} currency={currency} label="unrealized" /><span className="text-[14px] text-muted">unrealized</span></div>
                 <div className="mt-3 flex flex-wrap gap-1.5">{s.price_types.map((p) => <PriceTypeBadge key={p} type={p} />)}{s.stale && <Badge tone="warn">Stale prices</Badge>}</div>
               </>
             )}
@@ -90,7 +90,7 @@ export default function InvestmentsPage() {
             </>}
           </div>
         </div>
-        {s && <p className="border-t border-line px-6 py-2.5 text-[11.5px] text-faint">{s.cost_basis_note}</p>}
+        {s && <p className="border-t border-line px-6 py-2.5 text-[12.5px] text-faint">{s.cost_basis_note}</p>}
       </Card>
 
       <div className="grid gap-5 [&>*]:min-w-0 lg:grid-cols-12">
@@ -104,10 +104,10 @@ export default function InvestmentsPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={history.data.points.map((p) => ({ ...p, v: Number(p.value), h: Number(p.holdings) }))} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
                       <defs><linearGradient id="invg" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--chart-2)" stopOpacity={0.2} /><stop offset="100%" stopColor="var(--chart-2)" stopOpacity={0} /></linearGradient></defs>
-                      <XAxis dataKey="date" tickFormatter={(v) => formatDate(v, range === "1M" ? "d MMM" : "MMM yy")} tick={{ fill: "var(--faint)", fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={48} />
+                      <XAxis dataKey="date" tickFormatter={(v) => formatDate(v, range === "1M" ? "d MMM" : "MMM yy")} tick={{ fill: "var(--faint)", fontSize: 12 }} axisLine={false} tickLine={false} minTickGap={48} />
                       <YAxis hide domain={["auto", "auto"]} />
                       <Tooltip content={({ active, payload }) => active && payload?.[0] ? (
-                        <div className="rounded-xl border border-line bg-card px-3 py-2 text-[12px] shadow-pop">
+                        <div className="rounded-xl border border-line bg-card px-3 py-2 text-[13px] shadow-pop">
                           <p className="text-muted">{formatDate(payload[0].payload.date)}</p>
                           <p className="font-semibold tabular">{formatMoney(payload[0].payload.value, currency, { hidden })}</p>
                           {Number(payload[0].payload.net_flow) !== 0 && <p className="text-info">Contribution {formatMoney(payload[0].payload.net_flow, currency, { signed: true, hidden })}</p>}
@@ -120,19 +120,19 @@ export default function InvestmentsPage() {
                   <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {([["Total change", "total_change"], ["Your contributions", "contributions"], ["Market performance", "market"], ["Currency effect", "fx_effect"]] as const).map(([l, k]) => (
                       <div key={k} className="rounded-2xl bg-bg-subtle p-3">
-                        <p className="text-[11.5px] text-muted">{l}</p>
+                        <p className="text-[12.5px] text-muted">{l}</p>
                         <p className="mt-0.5 font-semibold text-ink"><Money value={history.data!.decomposition![k]} currency={currency} signed /></p>
                       </div>
                     ))}
                   </div>
                 )}
-                <p className="mt-3 text-[11.5px] text-faint">TWR {formatPct(history.data.twr, { signed: true })} · MWR {formatPct(history.data.mwr, { signed: true })} (annualized). {history.data.decomposition_note}</p>
+                <p className="mt-3 text-[12.5px] text-faint">TWR {formatPct(history.data.twr, { signed: true })} · MWR {formatPct(history.data.mwr, { signed: true })} (annualized). {history.data.decomposition_note}</p>
               </>
             )}
           </CardBody>
         </Card>
         <Card className="lg:col-span-4">
-          <CardHeader title="Allocation" action={<NativeSelect aria-label="Group allocation by" className="h-8 w-36 text-[12px]" value={group} onChange={(e) => setGroup(e.target.value)}>
+          <CardHeader title="Allocation" action={<NativeSelect aria-label="Group allocation by" className="h-8 w-36 text-[13px]" value={group} onChange={(e) => setGroup(e.target.value)}>
             <option value="asset_class">Asset class</option><option value="brokerage">Brokerage</option><option value="country">Country</option><option value="currency">Currency</option><option value="sector">Sector</option></NativeSelect>} />
           <CardBody>
             {holdings.isLoading ? <Skeleton className="mx-auto size-48 rounded-full" /> : holdings.data && (
@@ -141,14 +141,14 @@ export default function InvestmentsPage() {
                   data={(holdings.data.allocation[group] ?? []).map((a, i) => ({ key: a.label, label: labelize(a.label), value: a.value, share: a.share, color: PALETTE[i % PALETTE.length] }))} />
                 <ul className="mt-4 space-y-1.5">
                   {(holdings.data.allocation[group] ?? []).map((a, i) => (
-                    <li key={a.label} className="flex items-center gap-2.5 text-[13px]">
+                    <li key={a.label} className="flex items-center gap-2.5 text-[14px]">
                       <span className="size-2.5 rounded-full" style={{ background: PALETTE[i % PALETTE.length] }} />
                       <span className="flex-1 truncate text-ink-2">{labelize(a.label)}</span>
                       <span className="tabular text-muted">{formatPct(a.share, { decimals: 1 })}</span>
                     </li>
                   ))}
                 </ul>
-                {group === "sector" && <p className="mt-3 text-[11.5px] text-faint">Sector shown only where the provider supplies it; unknown values are not guessed.</p>}
+                {group === "sector" && <p className="mt-3 text-[12.5px] text-faint">Sector shown only where the provider supplies it; unknown values are not guessed.</p>}
               </>
             )}
           </CardBody>
@@ -159,8 +159,8 @@ export default function InvestmentsPage() {
         <CardHeader title="Holdings" description={`${rows.length} positions · values in trading currency unless noted`} />
         <div className="mt-4 overflow-x-auto">
           {holdings.isError ? <ErrorState error={holdings.error} retry={holdings.refetch} /> : (
-            <table className="w-full min-w-[960px] text-[13px]">
-              <thead className="border-y border-line bg-bg-subtle/60 text-left text-[12px] text-muted">
+            <table className="w-full min-w-[960px] text-[14px]">
+              <thead className="border-y border-line bg-bg-subtle/60 text-left text-[13px] text-muted">
                 <tr>{th("name", "Asset", false)}{th("brokerage", "Broker", false)}{th("quantity", "Qty")}{th("average_price", "Avg price")}{th("current_price", "Price")}
                   {th("market_value", "Value")}{th("unrealized", "Unrealized P/L")}{th("allocation_pct", "Alloc.")}{th("market_value_base", `Value (${currency})`)}</tr>
               </thead>
@@ -172,9 +172,9 @@ export default function InvestmentsPage() {
                     <tr key={`${h.account_id}-${h.security_id}`} tabIndex={0} onClick={() => setDetail(h)} onKeyDown={(e) => e.key === "Enter" && setDetail(h)} className="cursor-pointer hover:bg-bg-subtle/70">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <span className="grid size-9 place-items-center rounded-xl bg-bg-subtle text-[10.5px] font-bold text-ink-2">{h.ticker.slice(0, 4)}</span>
+                          <span className="grid size-9 place-items-center rounded-xl bg-bg-subtle text-[11.5px] font-bold text-ink-2">{h.ticker.slice(0, 4)}</span>
                           <div className="min-w-0"><p className="max-w-56 truncate font-medium text-ink">{h.name}</p>
-                            <p className="text-[11.5px] text-faint">{h.ticker}{h.isin ? ` · ${h.isin}` : ""} · {labelize(h.asset_class)}</p></div>
+                            <p className="text-[12.5px] text-faint">{h.ticker}{h.isin ? ` · ${h.isin}` : ""} · {labelize(h.asset_class)}</p></div>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-ink-2">{h.brokerage}</td>
@@ -184,7 +184,7 @@ export default function InvestmentsPage() {
                       <td className="px-4 py-3 text-right font-medium"><Money value={h.market_value} currency={h.currency} /></td>
                       <td className={cn("px-4 py-3 text-right", up ? "text-pos" : "text-neg")}>
                         <span className="inline-flex items-center gap-0.5 whitespace-nowrap">{up ? <ArrowUp className="size-3" aria-label="gain" /> : <ArrowDown className="size-3" aria-label="loss" />}<Money value={h.unrealized} currency={h.currency} signed /></span>
-                        <span className="block text-[11.5px]">{formatPct(h.unrealized_pct, { signed: true })}</span>
+                        <span className="block text-[12.5px]">{formatPct(h.unrealized_pct, { signed: true })}</span>
                       </td>
                       <td className="px-4 py-3 text-right tabular text-muted">{formatPct(h.allocation_pct, { decimals: 1 })}</td>
                       <td className="px-4 py-3 text-right font-medium"><Money value={h.market_value_base} currency={currency} /></td>
@@ -233,21 +233,21 @@ function HoldingDetail({ holding, onClose }: { holding: Holding | null; onClose:
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data.price_history.map((p) => ({ ...p, v: Number(p.price) }))}>
                 <YAxis hide domain={["auto", "auto"]} /><XAxis dataKey="date" hide />
-                <Tooltip content={({ active, payload }) => active && payload?.[0] ? <div className="rounded-lg border border-line bg-card px-2 py-1 text-[12px]">{formatDate(payload[0].payload.date)} · {formatMoney(payload[0].payload.price, data.currency, { hidden })}</div> : null} />
+                <Tooltip content={({ active, payload }) => active && payload?.[0] ? <div className="rounded-lg border border-line bg-card px-2 py-1 text-[13px]">{formatDate(payload[0].payload.date)} · {formatMoney(payload[0].payload.price, data.currency, { hidden })}</div> : null} />
                 <Area dataKey="v" stroke="var(--chart-3)" fill="var(--chart-3)" fillOpacity={0.08} strokeWidth={1.75} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-[13px]">
-            <dt className="text-muted">ISIN</dt><dd className="text-right font-mono text-[12px]">{data.security.isin ?? "—"}</dd>
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-[14px]">
+            <dt className="text-muted">ISIN</dt><dd className="text-right font-mono text-[13px]">{data.security.isin ?? "—"}</dd>
             <dt className="text-muted">Exchange</dt><dd className="text-right">{data.security.exchange ?? "—"}</dd>
             <dt className="text-muted">Asset class</dt><dd className="text-right">{labelize(data.security.asset_class)}</dd>
             <dt className="text-muted">Dividends (recorded)</dt><dd className="text-right"><Money value={data.dividends_total} currency={data.currency} /></dd>
           </dl>
           <div>
-            <p className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-muted">Activity</p>
-            {!data.activity.length ? <p className="text-[13px] text-muted">No recorded activity from this provider.</p> : (
-              <ul className="divide-y divide-line text-[13px]">
+            <p className="mb-2 text-[13px] font-semibold uppercase tracking-wider text-muted">Activity</p>
+            {!data.activity.length ? <p className="text-[14px] text-muted">No recorded activity from this provider.</p> : (
+              <ul className="divide-y divide-line text-[14px]">
                 {data.activity.map((a, i) => (
                   <li key={i} className="flex items-center justify-between py-2">
                     <span><Badge tone={a.type === "buy" ? "info" : a.type === "dividend" ? "pos" : "neutral"}>{a.type}</Badge> <span className="ml-2 text-muted">{formatDate(a.date)}</span></span>

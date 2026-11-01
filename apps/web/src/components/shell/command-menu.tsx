@@ -31,8 +31,8 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
     enabled: open && debounced.length >= 2,
   });
   const go = (href: string) => { onOpenChange(false); router.push(href); };
-  const item = "flex cursor-default items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-ink-2 aria-selected:bg-bg-subtle aria-selected:text-ink [&_svg]:size-4 [&_svg]:text-muted";
-  const group = "px-1.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-faint";
+  const item = "flex cursor-default items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] text-ink-2 aria-selected:bg-bg-subtle aria-selected:text-ink [&_svg]:size-4 [&_svg]:text-muted";
+  const group = "px-1.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:text-[12px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-faint";
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -45,8 +45,8 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
             <div className="flex items-center gap-3 border-b border-line px-4 transition-colors focus-within:bg-bg-subtle/60">
               <Search className="size-4 text-muted" aria-hidden />
               <Command.Input value={q} onValueChange={setQ} autoFocus placeholder="Search transactions, merchants, accounts…"
-                className="h-14 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-faint" />
-              {isFetching && <span className="text-[11px] text-faint">Searching…</span>}
+                className="h-14 flex-1 bg-transparent text-[16px] text-ink outline-none placeholder:text-faint" />
+              {isFetching && <span className="text-[12px] text-faint">Searching…</span>}
             </div>
             <Command.List className="max-h-[60vh] overflow-y-auto pb-2">
               {debounced.length < 2 && (
@@ -59,11 +59,11 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
               {debounced.length >= 2 && data && (
                 <>
                   {!data.accounts.length && !data.transactions.length && !data.categories.length && !data.investments.length && !data.reports.length && (
-                    <p className="px-4 py-10 text-center text-[13px] text-muted">No results for “{debounced}”.</p>
+                    <p className="px-4 py-10 text-center text-[14px] text-muted">No results for “{debounced}”.</p>
                   )}
                   {data.accounts.length > 0 && (
                     <Command.Group heading="Accounts" className={group}>
-                      {data.accounts.map((a) => <Command.Item key={a.id} value={`a${a.id}`} onSelect={() => go(`/accounts`)} className={item}><Wallet />{a.label}<span className="ml-auto text-[11px] capitalize text-faint">{a.type.replace("_", " ")}</span></Command.Item>)}
+                      {data.accounts.map((a) => <Command.Item key={a.id} value={`a${a.id}`} onSelect={() => go(`/accounts`)} className={item}><Wallet />{a.label}<span className="ml-auto text-[12px] capitalize text-faint">{a.type.replace("_", " ")}</span></Command.Item>)}
                     </Command.Group>
                   )}
                   {data.transactions.length > 0 && (
@@ -71,7 +71,7 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
                       {data.transactions.map((t) => (
                         <Command.Item key={t.id} value={`t${t.id}`} onSelect={() => go(`/transactions?id=${t.id}`)} className={item}>
                           <ArrowLeftRight /><span className="min-w-0 flex-1 truncate">{t.merchant ?? t.description}</span>
-                          <span className="text-[11px] text-faint">{relativeDay(t.date)}</span>
+                          <span className="text-[12px] text-faint">{relativeDay(t.date)}</span>
                           <span className="tabular w-24 text-right text-ink">{formatMoney(t.amount, t.currency, { hidden })}</span>
                         </Command.Item>
                       ))}
@@ -79,7 +79,7 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
                   )}
                   {data.investments.length > 0 && (
                     <Command.Group heading="Investments" className={group}>
-                      {data.investments.map((s) => <Command.Item key={s.id} value={`s${s.id}`} onSelect={() => go(`/investments`)} className={item}><LineChart />{s.label}<span className="ml-auto text-[11px] text-faint">{s.ticker}</span></Command.Item>)}
+                      {data.investments.map((s) => <Command.Item key={s.id} value={`s${s.id}`} onSelect={() => go(`/investments`)} className={item}><LineChart />{s.label}<span className="ml-auto text-[12px] text-faint">{s.ticker}</span></Command.Item>)}
                     </Command.Group>
                   )}
                   {data.categories.length > 0 && (
@@ -95,7 +95,7 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
                 </>
               )}
             </Command.List>
-            <div className="flex items-center gap-4 border-t border-line px-4 py-2 text-[11px] text-faint">
+            <div className="flex items-center gap-4 border-t border-line px-4 py-2 text-[12px] text-faint">
               <span><kbd className="font-sans">↑↓</kbd> navigate</span><span><kbd className="font-sans">↵</kbd> open</span><span><kbd className="font-sans">esc</kbd> close</span>
             </div>
           </Command>

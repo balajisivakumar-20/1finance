@@ -40,7 +40,7 @@ export default function BudgetsPage() {
           <Button variant="ghost" size="icon-sm" aria-label="Next month" disabled={isCurrent} onClick={() => setMonth(format(addMonths(m, 1), "yyyy-MM"))}><ChevronRight /></Button>
         </div>
         {data && (
-          <div className="flex flex-1 flex-wrap items-center justify-end gap-x-6 gap-y-1 text-[13px] text-muted">
+          <div className="flex flex-1 flex-wrap items-center justify-end gap-x-6 gap-y-1 text-[14px] text-muted">
             <span>Budgeted <b className="text-ink"><Money value={data.totals.budget} currency={currency} /></b></span>
             <span>Spent <b className="text-ink"><Money value={data.totals.spent} currency={currency} /></b></span>
             {isCurrent && <span>{formatPct(data.month_elapsed_pct, { decimals: 0 })} of month elapsed</span>}
@@ -57,11 +57,11 @@ export default function BudgetsPage() {
               <div className="flex items-center gap-3">
                 <CategoryIcon icon={b.category.icon} color={b.category.color} />
                 <div className="min-w-0 flex-1"><p className="font-semibold text-ink">{b.category.name}</p>
-                  <p className="text-[12px] text-muted"><Money value={b.spent} currency={currency} /> of <Money value={b.amount} currency={currency} /></p></div>
+                  <p className="text-[13px] text-muted"><Money value={b.spent} currency={currency} /> of <Money value={b.amount} currency={currency} /></p></div>
                 {b.status === "over" ? <Badge tone="neg"><AlertTriangle />Over budget</Badge> : b.status === "warning" ? <Badge tone="warn"><AlertTriangle />Nearly there</Badge> : <Badge tone="pos">On track</Badge>}
               </div>
               <Progress className="mt-4" value={pct} tone={b.status === "over" ? "neg" : b.status === "warning" ? "warn" : "accent"} label={`${b.category.name} budget used`} />
-              <div className="mt-2 flex items-center justify-between text-[12.5px]">
+              <div className="mt-2 flex items-center justify-between text-[13.5px]">
                 <span className="text-muted">{formatPct(b.percent, { decimals: 0 })} used</span>
                 <span className={Number(b.remaining) < 0 ? "font-medium text-neg" : "text-ink-2"}>{Number(b.remaining) < 0 ? "Over by " : ""}<Money value={Number(b.remaining) < 0 ? String(b.remaining).slice(1) : b.remaining} currency={currency} />{Number(b.remaining) >= 0 ? " left" : ""}</span>
               </div>
@@ -74,7 +74,7 @@ export default function BudgetsPage() {
         })}
       </div>
       {data && !data.items.length && <Card><EmptyState icon={PiggyBank} title="No budgets yet" description="Set a monthly limit for categories like groceries or restaurants." action={<Button variant="primary" onClick={() => setAdding(true)}><Plus />Create a budget</Button>} /></Card>}
-      <p className="text-[12px] text-faint">Budget rollover is planned as an optional future feature.</p>
+      <p className="text-[13px] text-faint">Budget rollover is planned as an optional future feature.</p>
       {(adding || edit) && <BudgetDialog edit={edit} onClose={() => { setAdding(false); setEdit(null); qc.invalidateQueries({ queryKey: ["budgets"] }); }} currency={currency} />}
     </div>
   );

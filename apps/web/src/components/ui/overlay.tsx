@@ -26,7 +26,7 @@ export function Sheet({ open, onOpenChange, title, description, children, footer
           <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-4">
             <div className="min-w-0">
               <Dialog.Title className="truncate text-base font-semibold text-ink">{title}</Dialog.Title>
-              {description ? <Dialog.Description className="mt-0.5 text-[13px] text-muted">{description}</Dialog.Description>
+              {description ? <Dialog.Description className="mt-0.5 text-[14px] text-muted">{description}</Dialog.Description>
                 : <Dialog.Description className="sr-only">Details</Dialog.Description>}
             </div>
             <Dialog.Close className="grid size-8 place-items-center rounded-lg text-muted hover:bg-bg-subtle hover:text-ink" aria-label="Close">
@@ -52,7 +52,7 @@ export function Modal({ open, onOpenChange, title, description, children, classN
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
               <Dialog.Title className="text-lg font-semibold tracking-tight text-ink">{title}</Dialog.Title>
-              {description ? <Dialog.Description className="mt-1 text-[13px] text-muted">{description}</Dialog.Description>
+              {description ? <Dialog.Description className="mt-1 text-[14px] text-muted">{description}</Dialog.Description>
                 : <Dialog.Description className="sr-only">Dialog</Dialog.Description>}
             </div>
             <Dialog.Close className="grid size-8 place-items-center rounded-lg text-muted hover:bg-bg-subtle hover:text-ink" aria-label="Close"><X className="size-4" /></Dialog.Close>
@@ -74,16 +74,16 @@ export function MenuContent({ className, align = "end", ...p }: DM.DropdownMenuC
   );
 }
 export function MenuItem({ className, ...p }: DM.DropdownMenuItemProps) {
-  return <DM.Item className={cn("flex cursor-default select-none items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] text-ink-2 outline-none data-[highlighted]:bg-bg-subtle data-[highlighted]:text-ink [&_svg]:size-4 [&_svg]:text-muted", className)} {...p} />;
+  return <DM.Item className={cn("flex cursor-default select-none items-center gap-2.5 rounded-xl px-2.5 py-2 text-[14px] text-ink-2 outline-none data-[highlighted]:bg-bg-subtle data-[highlighted]:text-ink [&_svg]:size-4 [&_svg]:text-muted", className)} {...p} />;
 }
 export function MenuLabel({ className, ...p }: DM.DropdownMenuLabelProps) {
-  return <DM.Label className={cn("px-2.5 py-1.5 text-[11px] font-medium uppercase tracking-wider text-faint", className)} {...p} />;
+  return <DM.Label className={cn("px-2.5 py-1.5 text-[12px] font-medium uppercase tracking-wider text-faint", className)} {...p} />;
 }
 export const MenuSeparator = () => <DM.Separator className="my-1 h-px bg-line" />;
 export const MenuRadioGroup = DM.RadioGroup;
 export function MenuRadioItem({ className, children, ...p }: DM.DropdownMenuRadioItemProps) {
   return (
-    <DM.RadioItem className={cn("flex cursor-default select-none items-center justify-between gap-2.5 rounded-xl px-2.5 py-2 text-[13px] text-ink-2 outline-none data-[highlighted]:bg-bg-subtle data-[state=checked]:font-medium data-[state=checked]:text-ink", className)} {...p}>
+    <DM.RadioItem className={cn("flex cursor-default select-none items-center justify-between gap-2.5 rounded-xl px-2.5 py-2 text-[14px] text-ink-2 outline-none data-[highlighted]:bg-bg-subtle data-[state=checked]:font-medium data-[state=checked]:text-ink", className)} {...p}>
       {children}
       <DM.ItemIndicator><span className="size-1.5 rounded-full bg-accent block" /></DM.ItemIndicator>
     </DM.RadioItem>
