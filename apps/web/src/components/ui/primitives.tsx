@@ -8,18 +8,18 @@ import { cn } from "@/lib/utils";
 
 // ---------------- Button ----------------
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-[background,color,box-shadow,transform] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-[background,color,box-shadow,transform,border-color] duration-200 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary: "bg-accent text-accent-ink hover:bg-accent-hover shadow-sm",
+        primary: "bg-accent text-accent-ink hover:bg-accent-hover shadow-[0_6px_16px_-8px_rgba(200,140,0,0.7)] hover:shadow-[0_10px_22px_-10px_rgba(200,140,0,0.8)]",
         secondary: "bg-card text-ink border border-line hover:bg-bg-subtle shadow-card",
         ghost: "text-ink-2 hover:bg-bg-subtle hover:text-ink",
         subtle: "bg-bg-subtle text-ink hover:bg-line",
         danger: "bg-neg text-white hover:opacity-90",
         link: "text-accent-fg underline-offset-4 hover:underline px-0 h-auto",
       },
-      size: { sm: "h-8 px-3 text-[13px]", md: "h-10 px-4", lg: "h-11 px-5 text-[15px]", icon: "size-9", "icon-sm": "size-8" },
+      size: { sm: "h-8 px-3.5 text-[13px]", md: "h-10 px-5", lg: "h-12 px-6 text-[15px]", icon: "size-10", "icon-sm": "size-8" },
     },
     defaultVariants: { variant: "secondary", size: "md" },
   },
@@ -42,13 +42,13 @@ Button.displayName = "Button";
 
 // ---------------- Card ----------------
 export function Card({ className, ...p }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-[var(--radius-card)] border border-line bg-card shadow-card", className)} {...p} />;
+  return <div className={cn("hl rounded-[var(--radius-card)] border border-line/70 bg-card shadow-card", className)} {...p} />;
 }
 export function CardHeader({ title, description, action, className }: { title: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode; className?: string }) {
   return (
     <div className={cn("flex flex-wrap items-start justify-between gap-3 px-5 pt-5 sm:px-6", className)}>
       <div className="min-w-0">
-        <h2 className="text-[15px] font-semibold tracking-tight text-ink">{title}</h2>
+        <h2 className="text-[17px] font-semibold tracking-tight text-ink">{title}</h2>
         {description && <p className="mt-0.5 text-[13px] text-muted">{description}</p>}
       </div>
       {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}
@@ -60,7 +60,7 @@ export function CardBody({ className, ...p }: React.HTMLAttributes<HTMLDivElemen
 }
 
 // ---------------- Badge ----------------
-const badgeVariants = cva("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium leading-4 [&_svg]:size-3", {
+const badgeVariants = cva("inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium leading-4 [&_svg]:size-3", {
   variants: {
     tone: {
       neutral: "bg-bg-subtle text-ink-2",
@@ -114,8 +114,8 @@ export function Progress({ value, tone = "accent", className, label }: { value: 
   const color = tone === "neg" ? "bg-neg" : tone === "warn" ? "bg-warn" : "bg-accent";
   return (
     <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(v)} aria-label={label}
-      className={cn("h-2 w-full overflow-hidden rounded-full bg-bg-subtle", className)}>
-      <div className={cn("h-full rounded-full transition-[width] duration-700 ease-out", color)} style={{ width: `${v}%` }} />
+      className={cn("h-2.5 w-full overflow-hidden rounded-full bg-bg-subtle", className)}>
+      <div className={cn("h-full rounded-full transition-[width] duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]", color)} style={{ width: `${v}%` }} />
     </div>
   );
 }
@@ -125,12 +125,12 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
   value: T; onChange: (v: T) => void; options: { value: T; label: React.ReactNode }[]; className?: string; size?: "sm" | "md"; label: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className={cn("inline-flex rounded-xl bg-bg-subtle p-0.5", className)}>
+    <div role="radiogroup" aria-label={label} className={cn("inline-flex rounded-full bg-bg-subtle p-1", className)}>
       {options.map((o) => (
         <button key={o.value} role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)}
-          className={cn("rounded-[10px] font-medium text-muted transition-all duration-150 hover:text-ink",
+          className={cn("rounded-full font-medium text-muted transition-all duration-200 hover:text-ink",
             size === "sm" ? "h-7 px-2.5 text-xs" : "h-8 px-3 text-[13px]",
-            value === o.value && "bg-card text-ink shadow-[0_1px_2px_rgba(0,0,0,0.08)]")}>
+            value === o.value && "bg-card text-ink shadow-[0_1px_2px_rgba(0,0,0,0.06),0_4px_10px_-4px_rgba(40,30,10,0.18)]")}>
           {o.label}
         </button>
       ))}
@@ -140,12 +140,12 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
 
 // ---------------- Form controls ----------------
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(({ className, ...p }, ref) => (
-  <input ref={ref} className={cn("h-10 w-full rounded-xl border border-line bg-card px-3 text-sm text-ink placeholder:text-faint transition-shadow focus:border-accent focus:outline-none focus:ring-4 focus:ring-[var(--ring)] disabled:opacity-60", className)} {...p} />
+  <input ref={ref} className={cn("h-11 w-full rounded-2xl border border-line bg-card px-4 text-sm text-ink placeholder:text-faint transition-shadow focus:border-accent focus:outline-none focus:ring-4 focus:ring-[var(--ring)] disabled:opacity-60", className)} {...p} />
 ));
 Input.displayName = "Input";
 
 export const NativeSelect = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(({ className, ...p }, ref) => (
-  <select ref={ref} className={cn("h-10 w-full appearance-none rounded-xl border border-line bg-card bg-[length:16px] bg-[right_10px_center] bg-no-repeat px-3 pr-8 text-sm text-ink focus:border-accent focus:outline-none focus:ring-4 focus:ring-[var(--ring)]", className)}
+  <select ref={ref} className={cn("h-11 w-full appearance-none rounded-2xl border border-line bg-card bg-[length:16px] bg-[right_14px_center] bg-no-repeat px-4 pr-9 text-sm text-ink focus:border-accent focus:outline-none focus:ring-4 focus:ring-[var(--ring)]", className)}
     style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")" }} {...p} />
 ));
 NativeSelect.displayName = "NativeSelect";

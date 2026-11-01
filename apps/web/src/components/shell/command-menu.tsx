@@ -42,7 +42,7 @@ export function CommandMenu({ open, onOpenChange }: { open: boolean; onOpenChang
           <Dialog.Title className="sr-only">Search</Dialog.Title>
           <Dialog.Description className="sr-only">Search transactions, merchants, accounts, investments, categories and reports</Dialog.Description>
           <Command shouldFilter={false} label="Global search">
-            <div className="flex items-center gap-3 border-b border-line px-4">
+            <div className="flex items-center gap-3 border-b border-line px-4 transition-colors focus-within:bg-bg-subtle/60">
               <Search className="size-4 text-muted" aria-hidden />
               <Command.Input value={q} onValueChange={setQ} autoFocus placeholder="Search transactions, merchants, accounts…"
                 className="h-14 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-faint" />

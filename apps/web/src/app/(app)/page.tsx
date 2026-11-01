@@ -30,7 +30,7 @@ export default function OverviewPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[13px] text-muted">{now ? format(now, "EEEE, d MMMM yyyy") : " "}</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">
+          <h1 className="mt-1 text-[30px] font-semibold leading-tight tracking-tight text-ink sm:text-[42px]">
             {now ? greeting(now) : "Hello"}{me?.display_name ? `, ${me.display_name.split(" ")[0]}` : ""}
           </h1>
           <p className="mt-0.5 text-[15px] text-muted">Here&apos;s your financial overview.</p>
@@ -352,7 +352,7 @@ function Insights({ className }: { className?: string }) {
           const Icon = iconFor(it.kind);
           const v = it.values?.current;
           return (
-            <div key={it.id} className="flex gap-3 rounded-2xl border border-line p-3.5">
+            <div key={it.id} className="hl flex gap-3 rounded-2xl border border-line p-3.5">
               <span className={cn("grid size-8 shrink-0 place-items-center rounded-xl",
                 it.kind === "positive" ? "bg-pos-soft text-pos" : it.kind === "attention" ? "bg-warn-soft text-warn" : "bg-info-soft text-info")}>
                 <Icon className="size-4" aria-hidden />

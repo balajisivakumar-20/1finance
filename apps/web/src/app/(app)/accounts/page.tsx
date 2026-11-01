@@ -220,7 +220,7 @@ function AddAccountWizard({ open, onOpenChange }: { open: boolean; onOpenChange:
             <div className="grid gap-2.5">
               {INSTITUTIONS.map((x) => (
                 <button key={x.slug} onClick={() => { setInst(x); setStep(2); }}
-                  className="flex items-center gap-3 rounded-2xl border border-line p-3.5 text-left transition-colors hover:border-accent hover:bg-accent-soft/40">
+                  className="flex items-center gap-3 hl rounded-2xl border border-line p-3.5 text-left hover:bg-accent-soft/40">
                   <InstitutionAvatar slug={x.slug} name={x.name} />
                   <span className="flex-1"><span className="block font-medium text-ink">{x.name}</span><span className="text-[12.5px] text-muted">{x.kind}</span></span>
                 </button>
@@ -234,7 +234,7 @@ function AddAccountWizard({ open, onOpenChange }: { open: boolean; onOpenChange:
                 const unavailable = m === "openbanking";
                 return (
                   <button key={m} disabled={unavailable} onClick={() => { setMethod(m); setStep(3); }}
-                    className="flex items-start gap-3 rounded-2xl border border-line p-3.5 text-left transition-colors enabled:hover:border-accent enabled:hover:bg-accent-soft/40 disabled:opacity-60">
+                    className="flex items-start gap-3 hl rounded-2xl border border-line p-3.5 text-left enabled:hover:bg-accent-soft/40 disabled:opacity-60">
                     <span className="grid size-9 place-items-center rounded-xl bg-bg-subtle text-ink-2"><I className="size-4" /></span>
                     <span className="flex-1">
                       <span className="flex items-center gap-2 font-medium text-ink">{METHOD_INFO[m].title}{unavailable && <Badge tone="outline">Not configured</Badge>}</span>

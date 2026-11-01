@@ -145,7 +145,7 @@ function Categories() {
         </form>
         <div className="grid gap-3 sm:grid-cols-2">
           {cats.map((c) => (
-            <div key={c.id} className="rounded-2xl border border-line p-3">
+            <div key={c.id} className="hl rounded-2xl border border-line p-3">
               <p className="flex items-center gap-2 font-medium text-ink"><span className="size-2.5 rounded-full" style={{ background: c.color ?? "var(--muted)" }} />{c.name}{c.custom && <Badge tone="accent">Custom</Badge>}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">{c.children.map((k) => (
                 <span key={k.id} className="inline-flex items-center gap-1 rounded-full bg-bg-subtle px-2 py-0.5 text-[12px] text-ink-2">{k.name}
@@ -189,11 +189,11 @@ function Security() {
   return (
     <>
       <Card><CardHeader title="Sign-in methods" /><CardBody className="space-y-3">
-        <div className="flex items-center gap-3 rounded-2xl border border-line p-4">
+        <div className="hl flex items-center gap-3 rounded-2xl border border-line p-4">
           <ShieldCheck className="size-5 text-accent-fg" /><div className="flex-1"><p className="font-medium text-ink">Authenticator app (TOTP)</p><p className="text-[12.5px] text-muted">Required for exports and data deletion once enabled.</p></div>
           {me?.mfa_enabled ? <Badge tone="pos">Enabled</Badge> : <Button size="sm" variant="primary" loading={setup.isPending} onClick={() => setup.mutate()}>Set up</Button>}
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-line p-4 opacity-80">
+        <div className="hl flex items-center gap-3 rounded-2xl border border-line p-4 opacity-80">
           <KeyRound className="size-5 text-ink-2" /><div className="flex-1"><p className="font-medium text-ink">Passkeys</p><p className="text-[12.5px] text-muted">Available once the server is configured with an HTTPS origin and relying-party ID.</p></div>
           <Badge tone="outline">Not configured</Badge>
         </div>

@@ -1,6 +1,6 @@
 /* 1Finance service worker — caches the app shell & static assets ONLY.
    Financial data (/api/*) is never cached: requests go straight to the network. */
-const VERSION = "1f-shell-v1";
+const VERSION = "1f-shell-v2";
 const SHELL = ["/offline.html", "/icons/icon.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (e) => {
