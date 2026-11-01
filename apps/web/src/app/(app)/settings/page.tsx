@@ -26,7 +26,7 @@ export default function SettingsPage() {
         <nav aria-label="Settings sections" className="flex gap-1 overflow-x-auto lg:flex-col">
           {SECTIONS.map((s) => (
             <button key={s} onClick={() => setActive(s)} aria-current={active === s ? "page" : undefined}
-              className={cn("whitespace-nowrap rounded-xl px-3 py-2 text-left text-[14.5px] font-medium transition-colors", active === s ? "bg-card text-ink shadow-card" : "text-muted hover:text-ink")}>{s}</button>
+              className={cn("whitespace-nowrap rounded-xl px-3 py-2 text-left text-[16px] font-medium transition-colors", active === s ? "bg-card text-ink shadow-card" : "text-muted hover:text-ink")}>{s}</button>
           ))}
         </nav>
         <div className="min-w-0 space-y-5">
@@ -60,7 +60,7 @@ function Profile() {
   return (
     <Card><CardHeader title="Profile" /><CardBody className="space-y-4">
       <div className="flex items-center gap-4"><span className="grid size-14 place-items-center rounded-full bg-accent-soft text-lg font-semibold text-accent-fg">{name.slice(0, 1).toUpperCase()}</span>
-        <p className="text-[14px] text-muted">Avatar uses your initials — 1Finance doesn&apos;t upload photos.</p></div>
+        <p className="text-[15.5px] text-muted">Avatar uses your initials — 1Finance doesn&apos;t upload photos.</p></div>
       <Field label="Display name" htmlFor="dn"><Input id="dn" value={name} onChange={(e) => setName(e.target.value)} className="max-w-sm" /></Field>
       <Field label="Email" htmlFor="em"><Input id="em" value={me?.email ?? ""} disabled className="max-w-sm" /></Field>
       <Button variant="primary" onClick={() => save.mutate({ display_name: name })} loading={save.isPending}>Save profile</Button>
@@ -113,13 +113,13 @@ function Connected() {
         {data?.connections.map((c) => (
           <li key={c.id} className="flex flex-wrap items-center gap-3 py-3">
             <div className="min-w-0 flex-1"><p className="font-medium text-ink">{c.institution} {c.is_demo && <Badge tone="warn">Demo</Badge>}</p>
-              <p className="text-[13px] text-muted">{c.connector} · last success {ago(c.last_successful_sync)}{c.last_error ? ` · ${c.last_error}` : ""}</p></div>
+              <p className="text-[14.5px] text-muted">{c.connector} · last success {ago(c.last_successful_sync)}{c.last_error ? ` · ${c.last_error}` : ""}</p></div>
             <ConnectionStatus status={c.status} lastSync={c.last_successful_sync} />
             {c.connector !== "manual" && <Button size="sm" loading={sync.isPending && sync.variables === c.id} onClick={() => sync.mutate(c.id)}>Sync now</Button>}
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-[13px] text-muted">Disconnect or rename individual accounts from the Accounts page.</p>
+      <p className="mt-3 text-[14.5px] text-muted">Disconnect or rename individual accounts from the Accounts page.</p>
     </CardBody></Card>
   );
 }
@@ -148,7 +148,7 @@ function Categories() {
             <div key={c.id} className="hl rounded-2xl border border-line p-3">
               <p className="flex items-center gap-2 font-medium text-ink"><span className="size-2.5 rounded-full" style={{ background: c.color ?? "var(--muted)" }} />{c.name}{c.custom && <Badge tone="accent">Custom</Badge>}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">{c.children.map((k) => (
-                <span key={k.id} className="inline-flex items-center gap-1 rounded-full bg-bg-subtle px-2 py-0.5 text-[13px] text-ink-2">{k.name}
+                <span key={k.id} className="inline-flex items-center gap-1 rounded-full bg-bg-subtle px-2 py-0.5 text-[14.5px] text-ink-2">{k.name}
                   {k.custom && <button aria-label={`Delete ${k.name}`} onClick={() => delCat.mutate(k.id)} className="text-faint hover:text-neg">×</button>}</span>))}</div>
             </div>
           ))}
@@ -161,11 +161,11 @@ function Categories() {
             {cats.map((c) => <optgroup key={c.id} label={c.name}>{(c.children.length ? c.children : [c]).map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}</optgroup>)}</NativeSelect>
           <Button type="submit" disabled={newRule.pattern.length < 2 || !newRule.category_id}><Plus />Add rule</Button>
         </form>
-        {!rules.data?.length ? <p className="text-[14px] text-muted">No rules yet. Correct a transaction&apos;s category and choose “apply to future” to teach 1Finance.</p> : (
+        {!rules.data?.length ? <p className="text-[15.5px] text-muted">No rules yet. Correct a transaction&apos;s category and choose “apply to future” to teach 1Finance.</p> : (
           <ul className="divide-y divide-line">{rules.data.map((r) => (
-            <li key={r.id} className="flex items-center gap-3 py-2.5 text-[14px]">
+            <li key={r.id} className="flex items-center gap-3 py-2.5 text-[15.5px]">
               <Badge tone={r.kind === "learned" ? "info" : "neutral"}>{r.kind}</Badge>
-              <code className="flex-1 truncate font-mono text-[13px] text-ink">{r.pattern}</code>
+              <code className="flex-1 truncate font-mono text-[14.5px] text-ink">{r.pattern}</code>
               <span className="text-muted">→ {r.category.name}</span>
               <Button variant="ghost" size="icon-sm" aria-label="Delete rule" onClick={() => delRule.mutate(r.id)}><Trash2 /></Button>
             </li>))}</ul>
@@ -190,29 +190,29 @@ function Security() {
     <>
       <Card><CardHeader title="Sign-in methods" /><CardBody className="space-y-3">
         <div className="hl flex items-center gap-3 rounded-2xl border border-line p-4">
-          <ShieldCheck className="size-5 text-accent-fg" /><div className="flex-1"><p className="font-medium text-ink">Authenticator app (TOTP)</p><p className="text-[13.5px] text-muted">Required for exports and data deletion once enabled.</p></div>
+          <ShieldCheck className="size-5 text-accent-fg" /><div className="flex-1"><p className="font-medium text-ink">Authenticator app (TOTP)</p><p className="text-[15px] text-muted">Required for exports and data deletion once enabled.</p></div>
           {me?.mfa_enabled ? <Badge tone="pos">Enabled</Badge> : <Button size="sm" variant="primary" loading={setup.isPending} onClick={() => setup.mutate()}>Set up</Button>}
         </div>
         <div className="hl flex items-center gap-3 rounded-2xl border border-line p-4 opacity-80">
-          <KeyRound className="size-5 text-ink-2" /><div className="flex-1"><p className="font-medium text-ink">Passkeys</p><p className="text-[13.5px] text-muted">Available once the server is configured with an HTTPS origin and relying-party ID.</p></div>
+          <KeyRound className="size-5 text-ink-2" /><div className="flex-1"><p className="font-medium text-ink">Passkeys</p><p className="text-[15px] text-muted">Available once the server is configured with an HTTPS origin and relying-party ID.</p></div>
           <Badge tone="outline">Not configured</Badge>
         </div>
-        <p className="text-[13.5px] text-muted">Sessions expire after 30 minutes of inactivity and 12 hours in total.</p>
+        <p className="text-[15px] text-muted">Sessions expire after 30 minutes of inactivity and 12 hours in total.</p>
       </CardBody></Card>
       <Card><CardHeader title="Active sessions" action={<Button size="sm" onClick={() => revokeOthers.mutate()}><LogOut />Sign out other devices</Button>} /><CardBody>
         <ul className="divide-y divide-line">{sessions.data?.map((s) => (
-          <li key={s.id} className="flex items-center gap-3 py-3 text-[14px]"><Smartphone className="size-4 text-muted" />
-            <div className="min-w-0 flex-1"><p className="truncate text-ink">{s.user_agent || "Unknown device"}</p><p className="text-[13px] text-muted">{s.ip} · active {ago(s.last_seen_at)}</p></div>
+          <li key={s.id} className="flex items-center gap-3 py-3 text-[15.5px]"><Smartphone className="size-4 text-muted" />
+            <div className="min-w-0 flex-1"><p className="truncate text-ink">{s.user_agent || "Unknown device"}</p><p className="text-[14.5px] text-muted">{s.ip} · active {ago(s.last_seen_at)}</p></div>
             {s.current ? <Badge tone="pos">This device</Badge> : <Button size="sm" variant="ghost" onClick={() => revoke.mutate(s.id)}>Revoke</Button>}</li>))}</ul>
       </CardBody></Card>
       <Card><CardHeader title="Security activity" /><CardBody>
-        <ul className="divide-y divide-line text-[14px]">{audit.data?.slice(0, 15).map((a) => (
+        <ul className="divide-y divide-line text-[15.5px]">{audit.data?.slice(0, 15).map((a) => (
           <li key={a.id} className="flex justify-between gap-3 py-2"><span className="capitalize text-ink">{a.action.replaceAll("_", " ")}</span><span className="text-muted">{formatDate(a.timestamp, "d MMM yyyy HH:mm")}{a.ip ? ` · ${a.ip}` : ""}</span></li>))}</ul>
       </CardBody></Card>
       {mfa && (
         <Modal open onOpenChange={(o) => !o && setMfa(null)} title="Set up two-factor authentication" description="Add this key to your authenticator app, then enter the 6-digit code.">
           <div className="space-y-4">
-            <div className="rounded-xl bg-bg-subtle p-3 text-center font-mono text-[14px] tracking-wider break-all">{mfa.secret}</div>
+            <div className="rounded-xl bg-bg-subtle p-3 text-center font-mono text-[15.5px] tracking-wider break-all">{mfa.secret}</div>
             <Field label="Verification code" htmlFor="mc"><Input id="mc" inputMode="numeric" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} /></Field>
             <div className="flex justify-end"><Button variant="primary" disabled={code.length !== 6} loading={enable.isPending} onClick={() => enable.mutate()}>Enable</Button></div>
           </div>
@@ -236,8 +236,8 @@ function DataMgmt() {
     <>
       <Card><CardHeader title="Export" description="Download everything as JSON, or use Reports for PDF/Excel." /><CardBody><Button onClick={exportAll}><Download />Export all data</Button></CardBody></Card>
       <Card><CardHeader title="Statement imports" description="Undo an import to remove exactly the transactions it added." /><CardBody>
-        {!imports.data?.length ? <p className="text-[14px] text-muted">No imports yet. Import statements from an account&apos;s menu on the Accounts page.</p> : (
-          <ul className="divide-y divide-line text-[14px]">{imports.data.map((i) => (
+        {!imports.data?.length ? <p className="text-[15.5px] text-muted">No imports yet. Import statements from an account&apos;s menu on the Accounts page.</p> : (
+          <ul className="divide-y divide-line text-[15.5px]">{imports.data.map((i) => (
             <li key={i.id} className="flex items-center gap-3 py-2.5"><span className="flex-1 truncate text-ink">{i.file_name}</span><Badge tone="outline">{i.status}</Badge>
               <span className="text-muted">{formatDate(i.imported_at)}</span>
               {i.status === "committed" && <Button size="sm" variant="ghost" onClick={() => revert.mutate(i.id)}>Undo</Button>}</li>))}</ul>)}
@@ -258,7 +258,7 @@ function Privacy() {
   const save = usePrefs();
   const { privacy, togglePrivacy } = useUi();
   const row = (title: string, desc: string, control: React.ReactNode) => (
-    <div className="flex items-center justify-between gap-4 py-4"><div><p className="font-medium text-ink">{title}</p><p className="text-[13.5px] text-muted">{desc}</p></div>{control}</div>
+    <div className="flex items-center justify-between gap-4 py-4"><div><p className="font-medium text-ink">{title}</p><p className="text-[15px] text-muted">{desc}</p></div>{control}</div>
   );
   return (
     <Card><CardHeader title="Privacy" description="1Finance has no ads, sells no data and uses no third-party analytics." /><CardBody className="divide-y divide-line">

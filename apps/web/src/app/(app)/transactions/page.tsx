@@ -64,18 +64,18 @@ export default function TransactionsPage() {
         <CategoryIcon icon={t.category?.icon} color={t.category?.color} size="sm" />
         <div className="min-w-0">
           <p className="truncate font-medium text-ink">{t.merchant ?? t.description}</p>
-          <p className="truncate text-[12.5px] text-faint">{t.description}</p>
+          <p className="truncate text-[14px] text-faint">{t.description}</p>
         </div>
       </div>) },
-    { id: "account", header: "Account", cell: ({ row: { original: t } }) => <span className="whitespace-nowrap text-ink-2">{t.account?.name}<span className="block text-[12.5px] text-faint">{t.account?.institution}</span></span> },
-    { id: "category", header: "Category", cell: ({ row: { original: t } }) => <span className="whitespace-nowrap text-ink-2">{t.category?.name ?? "—"}{t.category_source === "user" && <span className="ml-1 text-[11px] text-accent-fg" title="Set by you">●</span>}</span> },
+    { id: "account", header: "Account", cell: ({ row: { original: t } }) => <span className="whitespace-nowrap text-ink-2">{t.account?.name}<span className="block text-[14px] text-faint">{t.account?.institution}</span></span> },
+    { id: "category", header: "Category", cell: ({ row: { original: t } }) => <span className="whitespace-nowrap text-ink-2">{t.category?.name ?? "—"}{t.category_source === "user" && <span className="ml-1 text-[12.5px] text-accent-fg" title="Set by you">●</span>}</span> },
     { id: "type", header: "Type", cell: ({ row: { original: t } }) => <Badge tone={t.type === "transfer" ? "outline" : t.type.startsWith("investment") ? "info" : "neutral"}>{label(t.type)}</Badge> },
     { id: "amount", header: () => <span className="block text-right">Amount</span>, enableSorting: true, cell: ({ row: { original: t } }) => {
       const pos = Number(t.amount) > 0;
       return (
         <div className="text-right">
           <span className={cn("whitespace-nowrap font-semibold", pos ? "text-pos" : "text-ink")}><Money value={t.amount} currency={t.currency} signed={pos} /></span>
-          {t.currency !== currency && t.amount_base && <span className="block text-[12.5px] text-muted">≈ <Money value={t.amount_base} currency={currency} /></span>}
+          {t.currency !== currency && t.amount_base && <span className="block text-[14px] text-muted">≈ <Money value={t.amount_base} currency={currency} /></span>}
         </div>);
     } },
     { id: "status", header: "Status", cell: ({ row: { original: t } }) => (
@@ -112,7 +112,7 @@ export default function TransactionsPage() {
             {PRESETS.map((p) => (
               <button key={p.key} aria-pressed={f.preset === p.key}
                 onClick={() => { if (f.preset === p.key) return set({ preset: "", date_from: "", date_to: "" }); const [a, b] = p.range(); set({ preset: p.key, date_from: format(a, "yyyy-MM-dd"), date_to: format(b, "yyyy-MM-dd") }); }}
-                className={cn("h-8 rounded-full border px-3 text-[13px] font-medium transition-colors", f.preset === p.key ? "border-accent bg-accent-soft text-accent-fg" : "border-line text-ink-2 hover:bg-bg-subtle")}>
+                className={cn("h-8 rounded-full border px-3 text-[14.5px] font-medium transition-colors", f.preset === p.key ? "border-accent bg-accent-soft text-accent-fg" : "border-line text-ink-2 hover:bg-bg-subtle")}>
                 {p.label}
               </button>
             ))}
@@ -137,7 +137,7 @@ export default function TransactionsPage() {
               <Field label="Min amount" htmlFor="fmin"><Input id="fmin" inputMode="decimal" value={f.min_amount} onChange={(e) => set({ min_amount: e.target.value.replace(/[^\d.]/g, "") })} /></Field>
               <Field label="Max amount" htmlFor="fmax"><Input id="fmax" inputMode="decimal" value={f.max_amount} onChange={(e) => set({ max_amount: e.target.value.replace(/[^\d.]/g, "") })} /></Field>
             </div>
-            <label className="flex items-center gap-2 text-[14px] text-ink-2"><input type="checkbox" className="size-4 accent-[var(--accent)]" checked={f.review} onChange={(e) => set({ review: e.target.checked })} />Needs review only</label>
+            <label className="flex items-center gap-2 text-[15.5px] text-ink-2"><input type="checkbox" className="size-4 accent-[var(--accent)]" checked={f.review} onChange={(e) => set({ review: e.target.checked })} />Needs review only</label>
             <div className="sm:col-span-2 lg:col-span-3 flex items-end justify-end">
               <Button variant="ghost" size="sm" onClick={() => { setF({ account_id: "", category: "", type: "", currency: "", status: "", date_from: "", date_to: "", min_amount: "", max_amount: "", preset: "", review: false }); setPage(1); }}><X />Clear all</Button>
             </div>
@@ -150,8 +150,8 @@ export default function TransactionsPage() {
           <>
             {/* desktop table */}
             <div className="hidden overflow-x-auto md:block">
-              <table className="w-full text-[14px]">
-                <thead className="border-b border-line bg-bg-subtle/60 text-left text-[13px] text-muted">
+              <table className="w-full text-[15.5px]">
+                <thead className="border-b border-line bg-bg-subtle/60 text-left text-[14.5px] text-muted">
                   {table.getHeaderGroups().map((hg) => (
                     <tr key={hg.id}>{hg.headers.map((h) => (
                       <th key={h.id} scope="col" className={cn("px-4 py-3 font-medium", h.column.id === "amount" && "text-right")}
@@ -187,11 +187,11 @@ export default function TransactionsPage() {
                     <button onClick={() => open(t.id)} className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-bg-subtle">
                       <CategoryIcon icon={t.category?.icon} color={t.category?.color} />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[15px] font-medium text-ink">{t.merchant ?? t.description}</p>
-                        <p className="truncate text-[13px] text-muted">{relativeDay(t.date)} · {t.category?.name ?? "Uncategorized"}</p>
+                        <p className="truncate text-[16.5px] font-medium text-ink">{t.merchant ?? t.description}</p>
+                        <p className="truncate text-[14.5px] text-muted">{relativeDay(t.date)} · {t.category?.name ?? "Uncategorized"}</p>
                       </div>
                       <div className="text-right">
-                        <p className={cn("text-[15px] font-semibold", pos ? "text-pos" : "text-ink")}><Money value={t.amount} currency={t.currency} signed={pos} /></p>
+                        <p className={cn("text-[16.5px] font-semibold", pos ? "text-pos" : "text-ink")}><Money value={t.amount} currency={t.currency} signed={pos} /></p>
                         {t.status === "pending" && <Badge tone="warn">Pending</Badge>}
                       </div>
                     </button>
@@ -201,7 +201,7 @@ export default function TransactionsPage() {
             </ul>
             {data && !data.items.length && <EmptyState icon={SearchX} title="No transactions match" description="Try a different search or clear some filters." />}
             {data && data.total > 0 && (
-              <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-3 text-[13.5px] text-muted">
+              <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-3 text-[15px] text-muted">
                 <span>{(page - 1) * data.page_size + 1}–{Math.min(page * data.page_size, data.total)} of {data.total.toLocaleString()}</span>
                 <div className="flex items-center gap-1">
                   <Button variant="ghost" size="icon-sm" aria-label="Previous page" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}><ChevronLeft /></Button>
@@ -244,7 +244,7 @@ function TransactionDrawer({ id, onClose }: { id: number | null; onClose: () => 
   });
   const catChanged = t && form.category_id && String(t.category?.id ?? "") !== form.category_id;
   const row = (k: string, v: React.ReactNode) => (
-    <div className="flex items-start justify-between gap-4 py-2.5 text-[14px]"><dt className="text-muted">{k}</dt><dd className="text-right text-ink">{v}</dd></div>
+    <div className="flex items-start justify-between gap-4 py-2.5 text-[15.5px]"><dt className="text-muted">{k}</dt><dd className="text-right text-ink">{v}</dd></div>
   );
   return (
     <Sheet open={!!id} onOpenChange={(o) => !o && onClose()} title={t ? (t.merchant ?? t.description) : "Transaction"} description={t ? formatDate(t.date, "EEEE, d MMMM yyyy · HH:mm") : undefined}
@@ -254,7 +254,7 @@ function TransactionDrawer({ id, onClose }: { id: number | null; onClose: () => 
           <div className="rounded-2xl bg-bg-subtle p-4 text-center">
             <p className={cn("text-3xl font-semibold tracking-tight", Number(t.amount) > 0 ? "text-pos" : "text-ink")}><Money value={t.amount} currency={t.currency} signed={Number(t.amount) > 0} /></p>
             {t.currency !== currency && t.amount_base && (
-              <p className="mt-1 text-[13.5px] text-muted">≈ {formatMoney(t.amount_base, currency, { hidden })}{t.fx && <> · rate {Number(t.fx.rate).toPrecision(6)} ({t.fx.provider}{t.fx.derived ? ", derived" : ""}, {formatDate(t.fx.effective_at)})</>}</p>
+              <p className="mt-1 text-[15px] text-muted">≈ {formatMoney(t.amount_base, currency, { hidden })}{t.fx && <> · rate {Number(t.fx.rate).toPrecision(6)} ({t.fx.provider}{t.fx.derived ? ", derived" : ""}, {formatDate(t.fx.effective_at)})</>}</p>
             )}
             <div className="mt-2 flex justify-center gap-1.5">
               {t.status === "pending" ? <Badge tone="warn">Pending</Badge> : <Badge tone="pos">Posted</Badge>}
@@ -262,7 +262,7 @@ function TransactionDrawer({ id, onClose }: { id: number | null; onClose: () => 
             </div>
           </div>
           {(t.duplicate_status === "possible_duplicate" || t.transfer_group?.startsWith("suggested")) && (
-            <div className="rounded-2xl border border-warn/40 bg-warn-soft p-3.5 text-[14px]">
+            <div className="rounded-2xl border border-warn/40 bg-warn-soft p-3.5 text-[15.5px]">
               {t.duplicate_status === "possible_duplicate" ? (
                 <><p className="font-medium text-ink">This may be a duplicate</p><p className="mt-0.5 text-muted">A similar transaction exists on the same account within 2 days. Nothing was deleted.</p>
                   <div className="mt-2 flex gap-2"><Button size="sm" onClick={() => review.mutate("not_duplicate")}>Keep both</Button><Button size="sm" variant="danger" onClick={() => review.mutate("duplicate")}>Mark as duplicate</Button></div></>
@@ -273,23 +273,23 @@ function TransactionDrawer({ id, onClose }: { id: number | null; onClose: () => 
             </div>
           )}
           <dl className="divide-y divide-line">
-            {row("Original description", <span className="font-mono text-[13px]">{t.description}</span>)}
+            {row("Original description", <span className="font-mono text-[14.5px]">{t.description}</span>)}
             {row("Merchant", t.merchant ?? "—")}
             {row("Transaction date", formatDate(t.date, "d MMM yyyy HH:mm"))}
             {row("Posting date", t.posting_date ? formatDate(t.posting_date, "d MMM yyyy") : "—")}
             {row("Account", `${t.account?.name} · ${t.account?.institution}`)}
             {row("Original currency", t.currency)}
             {row("Import source", <Badge tone="outline">{t.source}</Badge>)}
-            {row("Reference", <span className="font-mono text-[13px]">{t.external_reference ?? "—"}</span>)}
+            {row("Reference", <span className="font-mono text-[14.5px]">{t.external_reference ?? "—"}</span>)}
             {row("Categorized by", t.category_source === "user" ? "You" : t.category_source === "rule" ? "Your rule" : t.category_source === "learned" ? "Learned from your edits" : t.category_source === "dictionary" ? "Merchant match" : "System")}
           </dl>
           <div className="space-y-4">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-muted">Your classification</p>
+            <p className="text-[14.5px] font-semibold uppercase tracking-wider text-muted">Your classification</p>
             <Field label="Category" htmlFor="tc"><NativeSelect id="tc" value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
               {cats.map((c) => <optgroup key={c.id} label={c.name}>{c.children.length ? c.children.map((k) => <option key={k.id} value={k.id}>{k.name}</option>) : <option value={c.id}>{c.name}</option>}</optgroup>)}
             </NativeSelect></Field>
             {catChanged && (
-              <div className="space-y-2 rounded-xl bg-accent-soft/60 p-3 text-[14px]">
+              <div className="space-y-2 rounded-xl bg-accent-soft/60 p-3 text-[15.5px]">
                 <label className="flex items-start gap-2"><input type="checkbox" className="mt-0.5 size-4 accent-[var(--accent)]" checked={form.apply_to_future} onChange={(e) => setForm({ ...form, apply_to_future: e.target.checked })} />
                   <span>Apply this category to future transactions from this merchant</span></label>
                 {form.apply_to_future && <label className="flex items-start gap-2 pl-6"><input type="checkbox" className="mt-0.5 size-4 accent-[var(--accent)]" checked={form.apply_to_existing} onChange={(e) => setForm({ ...form, apply_to_existing: e.target.checked })} />
@@ -300,7 +300,7 @@ function TransactionDrawer({ id, onClose }: { id: number | null; onClose: () => 
             <Field label="Tags" htmlFor="ttags" hint="Comma separated"><Input id="ttags" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="e.g. work, reimbursable" /></Field>
             <Field label="Notes" htmlFor="tn"><textarea id="tn" rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })}
               className="w-full rounded-xl border border-line bg-card px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-4 focus:ring-[var(--ring)]" /></Field>
-            <p className="text-[12.5px] text-faint">Edits are stored separately — the original data received from your institution is never modified.</p>
+            <p className="text-[14px] text-faint">Edits are stored separately — the original data received from your institution is never modified.</p>
           </div>
         </div>
       )}

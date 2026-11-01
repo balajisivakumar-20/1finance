@@ -71,7 +71,7 @@ function LoginForm() {
           <Input id="totp" inputMode="numeric" autoComplete="one-time-code" maxLength={6} {...register("totp")} />
         </Field>
       )}
-      {error && <p role="alert" className="rounded-xl bg-neg-soft px-3 py-2 text-[14px] text-neg">{error}</p>}
+      {error && <p role="alert" className="rounded-xl bg-neg-soft px-3 py-2 text-[15.5px] text-neg">{error}</p>}
       <Button type="submit" variant="primary" size="lg" className="w-full" loading={isSubmitting} disabled={!hydrated}>
         <Lock />Sign in
       </Button>
@@ -106,13 +106,13 @@ function GoogleMfaForm() {
   };
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <p className="text-[14px] text-ink-2">Signed in with Google. Enter the 6-digit code from your authenticator app to finish.</p>
+      <p className="text-[15.5px] text-ink-2">Signed in with Google. Enter the 6-digit code from your authenticator app to finish.</p>
       <Field label="Verification code" htmlFor="gtotp">
         <Input id="gtotp" inputMode="numeric" autoComplete="one-time-code" autoFocus maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} />
       </Field>
-      {error && <p role="alert" className="rounded-xl bg-neg-soft px-3 py-2 text-[14px] text-neg">{error}</p>}
+      {error && <p role="alert" className="rounded-xl bg-neg-soft px-3 py-2 text-[15.5px] text-neg">{error}</p>}
       <Button type="submit" variant="primary" size="lg" className="w-full" loading={busy} disabled={code.length !== 6}><Lock />Verify</Button>
-      <a href="/login" className="block text-center text-[14px] text-muted hover:text-ink">Start over</a>
+      <a href="/login" className="block text-center text-[15.5px] text-muted hover:text-ink">Start over</a>
     </form>
   );
 }
@@ -135,17 +135,17 @@ function SignIn({ health }: { health: { demo: boolean; google: boolean } | null 
   const showPassword = !!health && (health.demo || !health.google);
   return (
     <div className="space-y-4">
-      {error && <p role="alert" className="rounded-xl bg-neg-soft px-3 py-2 text-[14px] text-neg">{error}</p>}
+      {error && <p role="alert" className="rounded-xl bg-neg-soft px-3 py-2 text-[15.5px] text-neg">{error}</p>}
       {health?.google && (
         <>
           <Button asChild variant="secondary" size="lg" className="w-full">
             <a href={`/api/v1/auth/google/start?next=${encodeURIComponent(safeNext(params.get("next")))}`}><GoogleLogo />Continue with Google</a>
           </Button>
-          <p className="text-center text-[13px] text-muted">New to 1Finance? Continuing with Google creates your account.</p>
+          <p className="text-center text-[14.5px] text-muted">New to 1Finance? Continuing with Google creates your account.</p>
         </>
       )}
       {health?.google && showPassword && (
-        <div className="flex items-center gap-3 text-[13px] text-faint"><span className="h-px flex-1 bg-line" />or sign in with email<span className="h-px flex-1 bg-line" /></div>
+        <div className="flex items-center gap-3 text-[14.5px] text-faint"><span className="h-px flex-1 bg-line" />or sign in with email<span className="h-px flex-1 bg-line" /></div>
       )}
       {showPassword && <LoginForm />}
     </div>
@@ -170,7 +170,7 @@ export default function LoginPage() {
         <div className="hl rounded-3xl border border-line bg-card p-6 shadow-pop sm:p-7">
           <React.Suspense><SignIn health={health} /></React.Suspense>
         </div>
-        <div className="mt-5 space-y-2 text-center text-[13px] text-muted">
+        <div className="mt-5 space-y-2 text-center text-[14.5px] text-muted">
           <p className="inline-flex items-center gap-1.5"><ShieldCheck className="size-3.5 text-accent-fg" />Read-only access · Encrypted credentials · No ads, ever</p>
           {demo && <p className="text-faint">Demo mode · demo@1finance.app / demo-1finance</p>}
         </div>
