@@ -165,3 +165,35 @@ def test_budgets_and_goals(client):
     assert b["items"] and all(i["status"] in ("ok", "warning", "over") for i in b["items"])
     g = client.get("/api/v1/goals").json()["items"]
     assert all(D(x["progress_pct"]) <= 100 for x in g)
+
+
+def test_manual_goal_tracking(client):
+    r = client.post("/api/v1/goals", json={"name": "Buy Car", "goal_type": "car", "target_amount": "20000", "currency": "EUR",
+                                           "target_date": "2028-06-01"})
+    assert r.status_code == 201
+    gid = r.json()["id"]
+    get = lambda: next(x for x in client.get("/api/v1/goals").json()["items"] if x["id"] == gid)  # noqa: E731
+    assert D(get()["current"]) == 0 and get()["contributions"] == []
+
+    c1 = client.post(f"/api/v1/goals/{gid}/contributions", json={"amount": "1500", "on": "2026-09-01", "note": "Bonus"}).json()["id"]
+    client.post(f"/api/v1/goals/{gid}/contributions", json={"amount": "500", "on": "2026-10-01"})
+    g = get()
+    assert D(g["current"]) == 2000 and len(g["contributions"]) == 2
+    assert g["contributions"][-1]["note"] == "Bonus"
+    assert client.post(f"/api/v1/goals/{gid}/contributions", json={"amount": "0"}).status_code == 422
+
+    assert client.patch(f"/api/v1/goals/{gid}/contributions/{c1}", json={"amount": "1000", "note": None}).status_code == 200
+    g = get()
+    assert D(g["current"]) == 1500 and g["contributions"][-1]["note"] is None
+
+    assert client.patch(f"/api/v1/goals/{gid}", json={"name": "Buy EV", "target_amount": "30000", "target_date": None,
+                                                      "currency": "INR"}).status_code == 200
+    g = get()
+    assert g["name"] == "Buy EV" and D(g["target"]) == 30000 and g["target_date"] is None and g["type"] == "car"
+    assert g["currency"] == "INR" and D(g["current"]) == 1500
+
+    assert client.delete(f"/api/v1/goals/{gid}/contributions/{c1}").status_code == 200
+    assert D(get()["current"]) == 500
+    other = client.get("/api/v1/goals").json()["items"][0]["id"]
+    assert client.delete(f"/api/v1/goals/{other}/contributions/{c1}").status_code == 404
+    client.delete(f"/api/v1/goals/{gid}")
