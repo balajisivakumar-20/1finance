@@ -173,6 +173,7 @@ export default function LoginPage() {
         <div className="mt-5 space-y-2 text-center text-[14.5px] text-muted">
           <p className="inline-flex items-center gap-1.5"><ShieldCheck className="size-3.5 text-accent-fg" />Read-only access · Encrypted credentials · No ads, ever</p>
           {demo && <p className="text-faint">Demo mode · demo@1finance.app / demo-1finance</p>}
+          <p><a href="/privacy" className="underline-offset-2 hover:text-ink hover:underline">Privacy policy</a></p>
         </div>
       </main>
     </div>
