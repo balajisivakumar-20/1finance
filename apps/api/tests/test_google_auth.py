@@ -59,7 +59,10 @@ def _claims(q: dict, **over) -> dict:
             "sub": "g-1001", "email": "New.Person@gmail.com", "email_verified": True, "name": "New Person", **over}
 
 
-def test_google_disabled_by_default():
+def test_google_disabled_without_credentials(monkeypatch):
+    # Clear credentials explicitly so a developer's local .env doesn't change the outcome.
+    monkeypatch.setattr(get_settings(), "google_client_id", "")
+    monkeypatch.setattr(get_settings(), "google_client_secret", "")
     assert _web().get("/api/v1/auth/google/start").status_code == 404
     assert _web().get("/api/health").json()["google_enabled"] is False
 
