@@ -159,7 +159,7 @@ export default function LoginPage() {
   }, []);
   const demo = !!health?.demo;
   return (
-    <div className="relative grid min-h-dvh place-items-center overflow-hidden px-4">
+    <div className="relative grid min-h-viewport place-items-center overflow-hidden px-4">
       <div aria-hidden className="pointer-events-none absolute inset-0 [background:radial-gradient(60%_50%_at_50%_0%,var(--accent-soft),transparent_70%)]" />
       <main id="main" className="relative w-full max-w-[400px]">
         <div className="mb-8 flex flex-col items-center text-center">

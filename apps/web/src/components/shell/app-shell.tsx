@@ -39,14 +39,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isLoading || !me) {
     return (
-      <div className="grid min-h-dvh place-items-center" aria-busy="true">
+      <div className="grid min-h-viewport place-items-center" aria-busy="true">
         <LogoMark className="size-10 animate-pulse" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-viewport">
       <Sidebar />
       <SidebarSpacer>
         <Header onSearch={() => setCmdOpen(true)} />

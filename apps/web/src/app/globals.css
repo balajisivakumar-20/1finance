@@ -158,6 +158,21 @@
 }
 
 html { -webkit-text-size-adjust: 100%; }
+
+/* On laptop/desktop screens the whole UI renders at 90% scale, matching the browser's 90% zoom,
+   so the default (100%) browser zoom shows the denser layout. Phones/tablets keep 100%. */
+:root { --ui-zoom: 1; }
+@media (min-width: 1024px) {
+  :root { --ui-zoom: 0.9; }
+  html { zoom: var(--ui-zoom); }
+  /* Menus and tooltips are positioned by Floating UI in on-screen pixels; under a zoomed root the browser would
+     scale that position again and the menu lands ~10% off. Undo the zoom on the positioning wrapper and
+     re-apply it to the content so it stays anchored to its trigger and still renders at 90%. */
+  [data-radix-popper-content-wrapper] { zoom: calc(1 / var(--ui-zoom)); }
+  [data-radix-popper-content-wrapper] > * { zoom: var(--ui-zoom); }
+}
+/* Full-viewport height that stays full under --ui-zoom (100dvh shrinks with the zoom). */
+.min-h-viewport { min-height: calc(100dvh / var(--ui-zoom)); }
 body {
   font-size: 1.15625rem; /* 18.5px: browser default + 2.5px for text without an explicit size */
   background: var(--page-glow), var(--bg);
