@@ -46,7 +46,7 @@ export default function ReportsPage() {
         {REPORTS.map((r) => (
           <Card key={r.kind} className="flex flex-col p-5">
             <div className="flex items-start gap-3">
-              <span className="grid size-10 place-items-center rounded-2xl bg-accent-soft text-accent"><r.icon className="size-5" /></span>
+              <span className="grid size-10 place-items-center rounded-2xl bg-accent-soft text-accent-fg"><r.icon className="size-5" /></span>
               <div><p className="font-semibold text-ink">{r.title}</p><p className="mt-0.5 text-[12.5px] text-muted">{r.desc}</p></div>
             </div>
             <div className="mt-5 flex gap-2 pt-1">

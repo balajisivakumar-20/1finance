@@ -83,7 +83,7 @@ function Sidebar() {
                 collapsed ? "justify-center" : "px-3",
                 active ? "text-ink" : "text-muted hover:bg-bg-subtle hover:text-ink")}>
               {active && <motion.span layoutId="nav-active" className="absolute inset-0 rounded-xl bg-bg-subtle" transition={{ type: "spring", bounce: 0.15, duration: 0.4 }} />}
-              <item.icon className={cn("relative size-[18px]", active && "text-accent")} aria-hidden />
+              <item.icon className={cn("relative size-[18px]", active && "text-accent-fg")} aria-hidden />
               {!collapsed && <span className="relative">{item.label}</span>}
             </Link>
           );
@@ -93,7 +93,7 @@ function Sidebar() {
       <div className="space-y-2 p-3">
         {!collapsed && (
           <div className="flex items-start gap-2 rounded-2xl bg-bg-subtle px-3 py-3 text-[12px] text-muted">
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden />
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-accent-fg" aria-hidden />
             <span>Read-only connections. 1Finance can never move money.</span>
           </div>
         )}
@@ -237,7 +237,7 @@ function ProfileMenu() {
   return (
     <Menu>
       <MenuTrigger asChild>
-        <button className="ml-1 grid size-9 place-items-center rounded-full bg-accent-soft text-[13px] font-semibold text-accent ring-offset-2 ring-offset-bg hover:ring-2 hover:ring-line" aria-label="Profile menu">
+        <button className="ml-1 grid size-9 place-items-center rounded-full bg-accent-soft text-[13px] font-semibold text-accent-fg ring-offset-2 ring-offset-bg hover:ring-2 hover:ring-line" aria-label="Profile menu">
           {initials}
         </button>
       </MenuTrigger>
@@ -262,7 +262,7 @@ function DemoBanner() {
       <div className="flex items-center gap-3 rounded-2xl border border-dashed border-warn/40 bg-warn-soft px-4 py-2.5 text-[13px] text-ink-2">
         <Badge tone="warn">Demo data</Badge>
         <span className="min-w-0 truncate">You&apos;re viewing generated demonstration data — nothing here is real financial information.</span>
-        <Link href="/accounts?add=1" className="ml-auto hidden shrink-0 font-medium text-accent hover:underline sm:inline">Connect a real account</Link>
+        <Link href="/accounts?add=1" className="ml-auto hidden shrink-0 font-medium text-accent-fg hover:underline sm:inline">Connect a real account</Link>
       </div>
     </div>
   );
@@ -280,13 +280,13 @@ function BottomNav() {
           const active = isActive(pathname, n.href);
           return (
             <Link key={n.href} href={n.href} aria-current={active ? "page" : undefined}
-              className={cn("flex flex-col items-center justify-center gap-1 text-[10.5px] font-medium", active ? "text-accent" : "text-muted")}>
+              className={cn("flex flex-col items-center justify-center gap-1 text-[10.5px] font-medium", active ? "text-accent-fg" : "text-muted")}>
               <n.icon className="size-5" aria-hidden />{n.label}
             </Link>
           );
         })}
         <Menu>
-          <MenuTrigger className={cn("flex flex-col items-center justify-center gap-1 text-[10.5px] font-medium", moreActive ? "text-accent" : "text-muted")} aria-label="More sections">
+          <MenuTrigger className={cn("flex flex-col items-center justify-center gap-1 text-[10.5px] font-medium", moreActive ? "text-accent-fg" : "text-muted")} aria-label="More sections">
             <MoreHorizontal className="size-5" aria-hidden />More
           </MenuTrigger>
           <MenuContent side="top" className="mb-2 w-56">

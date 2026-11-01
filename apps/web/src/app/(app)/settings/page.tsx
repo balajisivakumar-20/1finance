@@ -59,7 +59,7 @@ function Profile() {
   const save = usePrefs();
   return (
     <Card><CardHeader title="Profile" /><CardBody className="space-y-4">
-      <div className="flex items-center gap-4"><span className="grid size-14 place-items-center rounded-full bg-accent-soft text-lg font-semibold text-accent">{name.slice(0, 1).toUpperCase()}</span>
+      <div className="flex items-center gap-4"><span className="grid size-14 place-items-center rounded-full bg-accent-soft text-lg font-semibold text-accent-fg">{name.slice(0, 1).toUpperCase()}</span>
         <p className="text-[13px] text-muted">Avatar uses your initials — 1Finance doesn&apos;t upload photos.</p></div>
       <Field label="Display name" htmlFor="dn"><Input id="dn" value={name} onChange={(e) => setName(e.target.value)} className="max-w-sm" /></Field>
       <Field label="Email" htmlFor="em"><Input id="em" value={me?.email ?? ""} disabled className="max-w-sm" /></Field>
@@ -190,7 +190,7 @@ function Security() {
     <>
       <Card><CardHeader title="Sign-in methods" /><CardBody className="space-y-3">
         <div className="flex items-center gap-3 rounded-2xl border border-line p-4">
-          <ShieldCheck className="size-5 text-accent" /><div className="flex-1"><p className="font-medium text-ink">Authenticator app (TOTP)</p><p className="text-[12.5px] text-muted">Required for exports and data deletion once enabled.</p></div>
+          <ShieldCheck className="size-5 text-accent-fg" /><div className="flex-1"><p className="font-medium text-ink">Authenticator app (TOTP)</p><p className="text-[12.5px] text-muted">Required for exports and data deletion once enabled.</p></div>
           {me?.mfa_enabled ? <Badge tone="pos">Enabled</Badge> : <Button size="sm" variant="primary" loading={setup.isPending} onClick={() => setup.mutate()}>Set up</Button>}
         </div>
         <div className="flex items-center gap-3 rounded-2xl border border-line p-4 opacity-80">

@@ -127,7 +127,7 @@ function SummaryCards() {
             <div className="flex items-center justify-between">
               <p className="text-[12.5px] font-medium text-muted">{c.title}</p>
               <span className={cn("grid size-8 place-items-center rounded-xl",
-                c.tone === "accent" ? "bg-accent-soft text-accent" : c.tone === "pos" ? "bg-pos-soft text-pos" : c.tone === "warn" ? "bg-warn-soft text-warn" : "bg-bg-subtle text-ink-2")}>
+                c.tone === "accent" ? "bg-accent-soft text-accent-fg" : c.tone === "pos" ? "bg-pos-soft text-pos" : c.tone === "warn" ? "bg-warn-soft text-warn" : "bg-bg-subtle text-ink-2")}>
                 <c.icon className="size-4" aria-hidden />
               </span>
             </div>
@@ -203,7 +203,7 @@ function Allocation({ className }: { className?: string }) {
               ))}
             </ul>
             {selected && (
-              <Link href={ALLOC_LINK[selected] ?? "/accounts"} className="mt-3 flex items-center justify-center gap-1 text-[13px] font-medium text-accent hover:underline">
+              <Link href={ALLOC_LINK[selected] ?? "/accounts"} className="mt-3 flex items-center justify-center gap-1 text-[13px] font-medium text-accent-fg hover:underline">
                 View {rows.find((r) => r.key === selected)?.label.toLowerCase()} <ArrowRight className="size-3.5" />
               </Link>
             )}
@@ -342,7 +342,7 @@ function Insights({ className }: { className?: string }) {
   const iconFor = (k: string) => (k === "positive" ? TrendingUp : k === "attention" ? TrendingDown : Lightbulb);
   return (
     <Card className={className}>
-      <CardHeader title={<span className="inline-flex items-center gap-2"><Sparkles className="size-4 text-accent" />Financial insights</span>}
+      <CardHeader title={<span className="inline-flex items-center gap-2"><Sparkles className="size-4 text-accent-fg" />Financial insights</span>}
         description="Calculated from your recorded data" />
       <CardBody className="space-y-2.5">
         {isLoading && [0, 1, 2].map((i) => <Skeleton key={i} className="h-16" />)}

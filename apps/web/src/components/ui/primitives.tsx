@@ -17,7 +17,7 @@ const buttonVariants = cva(
         ghost: "text-ink-2 hover:bg-bg-subtle hover:text-ink",
         subtle: "bg-bg-subtle text-ink hover:bg-line",
         danger: "bg-neg text-white hover:opacity-90",
-        link: "text-accent underline-offset-4 hover:underline px-0 h-auto",
+        link: "text-accent-fg underline-offset-4 hover:underline px-0 h-auto",
       },
       size: { sm: "h-8 px-3 text-[13px]", md: "h-10 px-4", lg: "h-11 px-5 text-[15px]", icon: "size-9", "icon-sm": "size-8" },
     },
@@ -64,7 +64,7 @@ const badgeVariants = cva("inline-flex items-center gap-1 rounded-full px-2 py-0
   variants: {
     tone: {
       neutral: "bg-bg-subtle text-ink-2",
-      accent: "bg-accent-soft text-accent",
+      accent: "bg-accent-soft text-accent-fg",
       pos: "bg-pos-soft text-pos",
       neg: "bg-neg-soft text-neg",
       warn: "bg-warn-soft text-warn",

@@ -68,7 +68,7 @@ export default function TransactionsPage() {
         </div>
       </div>) },
     { id: "account", header: "Account", cell: ({ row: { original: t } }) => <span className="whitespace-nowrap text-ink-2">{t.account?.name}<span className="block text-[11.5px] text-faint">{t.account?.institution}</span></span> },
-    { id: "category", header: "Category", cell: ({ row: { original: t } }) => <span className="whitespace-nowrap text-ink-2">{t.category?.name ?? "—"}{t.category_source === "user" && <span className="ml-1 text-[10px] text-accent" title="Set by you">●</span>}</span> },
+    { id: "category", header: "Category", cell: ({ row: { original: t } }) => <span className="whitespace-nowrap text-ink-2">{t.category?.name ?? "—"}{t.category_source === "user" && <span className="ml-1 text-[10px] text-accent-fg" title="Set by you">●</span>}</span> },
     { id: "type", header: "Type", cell: ({ row: { original: t } }) => <Badge tone={t.type === "transfer" ? "outline" : t.type.startsWith("investment") ? "info" : "neutral"}>{label(t.type)}</Badge> },
     { id: "amount", header: () => <span className="block text-right">Amount</span>, enableSorting: true, cell: ({ row: { original: t } }) => {
       const pos = Number(t.amount) > 0;
@@ -112,7 +112,7 @@ export default function TransactionsPage() {
             {PRESETS.map((p) => (
               <button key={p.key} aria-pressed={f.preset === p.key}
                 onClick={() => { if (f.preset === p.key) return set({ preset: "", date_from: "", date_to: "" }); const [a, b] = p.range(); set({ preset: p.key, date_from: format(a, "yyyy-MM-dd"), date_to: format(b, "yyyy-MM-dd") }); }}
-                className={cn("h-8 rounded-full border px-3 text-[12px] font-medium transition-colors", f.preset === p.key ? "border-accent bg-accent-soft text-accent" : "border-line text-ink-2 hover:bg-bg-subtle")}>
+                className={cn("h-8 rounded-full border px-3 text-[12px] font-medium transition-colors", f.preset === p.key ? "border-accent bg-accent-soft text-accent-fg" : "border-line text-ink-2 hover:bg-bg-subtle")}>
                 {p.label}
               </button>
             ))}

@@ -59,7 +59,7 @@ export default function GoalsPage() {
           return (
             <Card key={g.id} className="flex flex-col p-5">
               <div className="flex items-start gap-3">
-                <span className="grid size-10 place-items-center rounded-2xl bg-accent-soft text-accent"><Icon className="size-5" /></span>
+                <span className="grid size-10 place-items-center rounded-2xl bg-accent-soft text-accent-fg"><Icon className="size-5" /></span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-ink">{g.name}</p>
                   <p className="text-[12px] text-muted">{g.target_date ? `Target ${formatDate(g.target_date, "d MMM yyyy")}` : "No target date"}</p>
