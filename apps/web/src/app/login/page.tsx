@@ -167,7 +167,7 @@ export default function LoginPage() {
           <h1 className="mt-5 text-2xl font-semibold tracking-tight text-ink">Welcome to 1Finance</h1>
           <p className="mt-1.5 text-sm text-muted">One app. Every asset. Complete financial clarity.</p>
         </div>
-        <div className="rounded-3xl border border-line bg-card p-6 shadow-pop sm:p-7">
+        <div className="hl rounded-3xl border border-line bg-card p-6 shadow-pop sm:p-7">
           <React.Suspense><SignIn health={health} /></React.Suspense>
         </div>
         <div className="mt-5 space-y-2 text-center text-[12px] text-muted">

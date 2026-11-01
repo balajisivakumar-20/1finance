@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, ChevronsLeft, Eye, EyeOff, LogOut, Monitor, Moon, MoreHorizontal, RefreshCw, Search, Settings, ShieldCheck, Sun } from "lucide-react";
-import { motion } from "motion/react";
-import { Wordmark, LogoMark } from "@/components/brand";
+import { Bell, ChevronsUpDown, Eye, EyeOff, LogOut, Monitor, Moon, MoreHorizontal, PanelLeft, RefreshCw, Search, Settings, ShieldCheck, Sun } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { LogoMark } from "@/components/brand";
 import { Badge, Button } from "@/components/ui/primitives";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuRadioGroup, MenuRadioItem, MenuSeparator, MenuTrigger, Tip } from "@/components/ui/overlay";
 import { CommandMenu } from "./command-menu";
-import { NAV, isActive } from "./nav";
+import { NAV, SECTIONS, currentNav, isActive, type NavItem } from "./nav";
 import { api } from "@/lib/api";
 import { CURRENCIES, ago } from "@/lib/format";
 import { useCurrency, useMe, useSummary, useSyncAll } from "@/lib/hooks";
@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <SidebarSpacer>
         <Header onSearch={() => setCmdOpen(true)} />
         {me.demo_mode && <DemoBanner />}
-        <main id="main" className="mx-auto w-full max-w-[1400px] px-4 pb-28 pt-5 sm:px-6 lg:px-8 lg:pb-12">{children}</main>
+        <main id="main" className="mx-auto w-full max-w-[1400px] px-4 pb-32 pt-5 sm:px-6 lg:px-8 lg:pb-12">{children}</main>
       </SidebarSpacer>
       <BottomNav />
       <CommandMenu open={cmdOpen} onOpenChange={setCmdOpen} />
@@ -59,73 +59,114 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+const SPRING = { type: "spring", bounce: 0.18, duration: 0.45 } as const;
+
 function SidebarSpacer({ children }: { children: React.ReactNode }) {
   const collapsed = useUi((s) => s.sidebarCollapsed);
-  return <div className={cn("transition-[padding] duration-300", collapsed ? "lg:pl-[76px]" : "lg:pl-[248px]")}>{children}</div>;
+  return <div className={cn("transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", collapsed ? "lg:pl-[108px]" : "lg:pl-[288px]")}>{children}</div>;
 }
 
 function Sidebar() {
   const pathname = usePathname();
   const { sidebarCollapsed: collapsed, toggleSidebar } = useUi();
+  const settings = NAV.find((n) => n.href === "/settings")!;
   return (
     <aside aria-label="Primary"
-      className={cn("fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line bg-card/70 backdrop-blur-xl transition-[width] duration-300 lg:flex",
-        collapsed ? "w-[76px]" : "w-[248px]")}>
-      <div className={cn("flex h-16 items-center", collapsed ? "justify-center" : "px-5")}>
-        <Link href="/" aria-label="1Finance home">{collapsed ? <LogoMark /> : <Wordmark />}</Link>
+      className={cn("sidebar-surface fixed bottom-3 left-3 top-3 z-30 hidden flex-col overflow-hidden rounded-[30px] lg:flex",
+        "transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", collapsed ? "w-[84px]" : "w-[264px]")}>
+      <div className={cn("flex shrink-0 items-center gap-3 pt-5", collapsed ? "flex-col px-3" : "px-5")}>
+        <Link href="/" aria-label="1Finance home" className="shrink-0 rounded-2xl bg-card/80 p-1 shadow-[0_2px_10px_-4px_rgba(31,22,0,0.25)] ring-1 ring-white/60 dark:ring-white/5">
+          <LogoMark className="size-9" />
+        </Link>
+        <AnimatePresence initial={false}>
+          {!collapsed && (
+            <motion.div key="brand" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }} transition={{ duration: 0.2 }} className="min-w-0 flex-1">
+              <p className="truncate text-[19px] font-semibold leading-tight tracking-tight text-ink">1Finance</p>
+              <p className="truncate text-[13px] text-muted">Personal finance</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <Tip content={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+          <button onClick={toggleSidebar} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed}
+            className="grid size-9 shrink-0 place-items-center rounded-xl text-muted transition-colors hover:bg-card/70 hover:text-ink">
+            <PanelLeft className="size-[18px]" aria-hidden />
+          </button>
+        </Tip>
       </div>
-      <nav className="flex-1 space-y-0.5 px-3 py-3">
-        {NAV.map((item) => {
-          const active = isActive(pathname, item.href);
-          const link = (
-            <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}
-              className={cn("group relative flex h-10 items-center gap-3 rounded-xl text-[14px] font-medium transition-colors",
-                collapsed ? "justify-center" : "px-3",
-                active ? "text-ink" : "text-muted hover:bg-bg-subtle hover:text-ink")}>
-              {active && <motion.span layoutId="nav-active" className="absolute inset-0 rounded-xl bg-bg-subtle" transition={{ type: "spring", bounce: 0.15, duration: 0.4 }} />}
-              <item.icon className={cn("relative size-[18px]", active && "text-accent-fg")} aria-hidden />
-              {!collapsed && <span className="relative">{item.label}</span>}
-            </Link>
-          );
-          return collapsed ? <Tip key={item.href} content={item.label}>{link}</Tip> : link;
-        })}
-      </nav>
-      <div className="space-y-2 p-3">
-        {!collapsed && (
-          <div className="flex items-start gap-2 rounded-2xl bg-bg-subtle px-3 py-3 text-[12px] text-muted">
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-accent-fg" aria-hidden />
-            <span>Read-only connections. 1Finance can never move money.</span>
+      {collapsed && <div className="mx-6 mt-3 h-px bg-ink/10" aria-hidden />}
+
+      <nav className={cn("flex-1 overflow-y-auto overflow-x-hidden pb-3", collapsed ? "px-3 pt-3" : "px-4 pt-4")}>
+        {SECTIONS.map((section) => (
+          <div key={section} className={cn(collapsed ? "space-y-1.5 pb-3" : "pb-4")}>
+            {!collapsed && <p className="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-faint">{section}</p>}
+            <div className="space-y-1">
+              {NAV.filter((n) => n.section === section).map((item) => <SideLink key={item.href} item={item} active={isActive(pathname, item.href)} collapsed={collapsed} />)}
+            </div>
           </div>
-        )}
-        <button onClick={toggleSidebar} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className={cn("flex h-9 w-full items-center gap-2 rounded-xl text-[13px] text-muted hover:bg-bg-subtle hover:text-ink", collapsed ? "justify-center" : "px-3")}>
-          <ChevronsLeft className={cn("size-4 transition-transform", collapsed && "rotate-180")} aria-hidden />
-          {!collapsed && "Collapse"}
-        </button>
+        ))}
+      </nav>
+
+      <div className={cn("shrink-0 space-y-2 pb-4", collapsed ? "px-3" : "px-4")}>
+        <SideLink item={settings} active={isActive(pathname, settings.href)} collapsed={collapsed} />
+        <ProfileMenu variant={collapsed ? "avatar" : "card"} />
       </div>
     </aside>
   );
 }
 
+function SideLink({ item, active, collapsed }: { item: NavItem; active: boolean; collapsed: boolean }) {
+  const link = (
+    <Link href={item.href} aria-current={active ? "page" : undefined} aria-label={collapsed ? item.label : undefined}
+      className={cn("group relative flex items-center gap-3 text-[15px] font-medium transition-colors duration-200",
+        collapsed ? "mx-auto size-[52px] justify-center rounded-[18px]" : "h-12 rounded-full px-4",
+        active ? "text-ink" : "text-ink-2/80 hover:text-ink")}>
+      {active && <motion.span layoutId="nav-active" className="nav-pill absolute inset-0" style={{ borderRadius: collapsed ? 18 : 999 }} transition={SPRING} />}
+      {!active && <span className={cn("absolute inset-0 bg-card/0 transition-colors duration-200 group-hover:bg-card/45", collapsed ? "rounded-[18px]" : "rounded-full")} aria-hidden />}
+      <item.icon className={cn("relative size-[20px] shrink-0 transition-transform duration-200 group-hover:scale-105", active && "text-ink")} strokeWidth={1.75} aria-hidden />
+      {!collapsed && <span className={cn("relative truncate", active && "font-semibold")}>{item.label}</span>}
+    </Link>
+  );
+  return collapsed ? <Tip content={item.label}>{link}</Tip> : link;
+}
+
 function Header({ onSearch }: { onSearch: () => void }) {
   const { data: summary } = useSummary();
+  const { data: me } = useMe();
   const sync = useSyncAll();
+  const pathname = usePathname();
   const { privacy, togglePrivacy } = useUi();
   const [isMac, setIsMac] = React.useState(true);
   React.useEffect(() => setIsMac(/Mac|iPhone|iPad/.test(navigator.platform)), []);
+  const nav = currentNav(pathname);
+  const [scrolled, setScrolled] = React.useState(false);
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const first = me?.display_name?.split(" ")[0];
+  const blurb = pathname === "/" && first ? `Welcome back, ${first} — here's where you stand` : nav?.blurb;
   return (
-    <header className="sticky top-0 z-20 border-b border-line/70 bg-bg/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-2 px-4 sm:h-16 sm:px-6 lg:px-8">
-        <Link href="/" className="lg:hidden" aria-label="1Finance home"><LogoMark className="size-7" /></Link>
-        <button onClick={onSearch}
-          aria-label="Search"
-          className="ml-1 flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-xl border border-line bg-card text-[13px] text-faint transition-colors hover:border-line-strong sm:w-auto sm:min-w-0 sm:flex-1 sm:justify-start sm:px-3 sm:max-w-sm lg:ml-0">
-          <Search className="size-4 shrink-0" aria-hidden />
-          <span className="hidden truncate sm:inline">Search transactions, accounts…</span>
-          <kbd className="ml-auto hidden rounded-md border border-line bg-bg-subtle px-1.5 py-0.5 font-sans text-[11px] text-muted sm:inline">{isMac ? "⌘" : "Ctrl"} K</kbd>
-        </button>
+    <header className="sticky top-0 z-20">
+      <div aria-hidden className={cn("header-glass pointer-events-none absolute inset-x-0 -bottom-8 top-0 transition-opacity duration-300", scrolled ? "opacity-100" : "opacity-0")} />
+      <div className="relative mx-auto flex h-14 max-w-[1400px] items-center gap-2 px-4 sm:h-16 sm:px-6 lg:h-[76px] lg:px-8">
+        <Link href="/" className="lg:hidden" aria-label="1Finance home"><LogoMark className="size-8" /></Link>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={nav?.href ?? pathname} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}
+            className="hidden min-w-0 lg:block">
+            <p className="truncate text-[17px] font-semibold tracking-tight text-ink">{nav?.label ?? "1Finance"}</p>
+            {blurb && <p className="truncate text-[13px] text-muted">{blurb}</p>}
+          </motion.div>
+        </AnimatePresence>
         <div className="ml-auto flex min-w-0 items-center gap-0.5 sm:gap-1">
-          <span className="mr-2 hidden text-[12px] text-muted xl:inline" title={summary?.last_sync ?? undefined}>
+          <button onClick={onSearch} aria-label="Search"
+            className="mr-1 flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full border border-line/80 bg-card/80 text-[13px] text-faint shadow-card backdrop-blur transition-all duration-200 hover:border-line-strong hover:text-muted sm:w-64 sm:justify-start sm:px-4">
+            <Search className="size-4 shrink-0" aria-hidden />
+            <span className="hidden truncate sm:inline">Search…</span>
+            <kbd className="ml-auto hidden rounded-full border border-line bg-bg-subtle px-2 py-0.5 font-sans text-[11px] text-muted sm:inline">{isMac ? "⌘" : "Ctrl"} K</kbd>
+          </button>
+          <span className="mr-1 hidden text-[12px] text-muted 2xl:inline" title={summary?.last_sync ?? undefined}>
             {summary?.last_sync ? `Synced ${ago(summary.last_sync)}` : "Not synced yet"}
           </span>
           <Tip content="Refresh all accounts">
@@ -141,7 +182,7 @@ function Header({ onSearch }: { onSearch: () => void }) {
           <CurrencyMenu />
           <span className="hidden sm:inline-flex"><ThemeMenu /></span>
           <Notifications />
-          <ProfileMenu />
+          <span className="lg:hidden"><ProfileMenu variant="avatar" /></span>
         </div>
       </div>
     </header>
@@ -224,7 +265,7 @@ function Notifications() {
   );
 }
 
-function ProfileMenu() {
+function ProfileMenu({ variant }: { variant: "avatar" | "card" }) {
   const { data: me } = useMe();
   const router = useRouter();
   const qc = useQueryClient();
@@ -234,14 +275,24 @@ function ProfileMenu() {
     qc.clear();
     router.replace("/login");
   };
+  const avatar = <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-[14px] font-semibold text-accent-fg ring-1 ring-accent/30">{initials}</span>;
   return (
     <Menu>
       <MenuTrigger asChild>
-        <button className="ml-1 grid size-9 place-items-center rounded-full bg-accent-soft text-[13px] font-semibold text-accent-fg ring-offset-2 ring-offset-bg hover:ring-2 hover:ring-line" aria-label="Profile menu">
-          {initials}
-        </button>
+        {variant === "card" ? (
+          <button className="flex w-full items-center gap-3 rounded-[22px] p-2 text-left transition-colors duration-200 hover:bg-card/55" aria-label="Profile menu">
+            {avatar}
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[15px] font-semibold text-ink">{me?.display_name}</span>
+              <span className="block truncate text-[12.5px] text-muted">{me?.email}</span>
+            </span>
+            <ChevronsUpDown className="size-4 shrink-0 text-muted" aria-hidden />
+          </button>
+        ) : (
+          <button className="mx-auto grid place-items-center rounded-full transition-transform duration-200 hover:scale-105" aria-label="Profile menu">{avatar}</button>
+        )}
       </MenuTrigger>
-      <MenuContent className="w-60">
+      <MenuContent className="w-60" side={variant === "card" ? "top" : "bottom"} align={variant === "card" ? "start" : "end"}>
         <div className="px-2.5 py-2">
           <p className="text-[13px] font-semibold text-ink">{me?.display_name}</p>
           <p className="truncate text-[12px] text-muted">{me?.email}</p>
@@ -273,20 +324,21 @@ function BottomNav() {
   const router = useRouter();
   const more = NAV.filter((n) => !("mobile" in n && n.mobile));
   const moreActive = more.some((n) => isActive(pathname, n.href));
+  const item = "relative flex flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium transition-colors duration-200";
   return (
-    <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card/90 backdrop-blur-xl pb-safe lg:hidden">
-      <div className="mx-auto grid h-16 max-w-lg grid-cols-5">
+    <nav aria-label="Primary" className="fixed inset-x-3 bottom-3 z-30 lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div className="mx-auto grid h-[66px] max-w-lg grid-cols-5 gap-1 rounded-[26px] border border-white/60 bg-card/80 p-1.5 shadow-pop backdrop-blur-xl dark:border-white/5">
         {NAV.filter((n) => "mobile" in n && n.mobile).map((n) => {
           const active = isActive(pathname, n.href);
           return (
-            <Link key={n.href} href={n.href} aria-current={active ? "page" : undefined}
-              className={cn("flex flex-col items-center justify-center gap-1 text-[10.5px] font-medium", active ? "text-accent-fg" : "text-muted")}>
-              <n.icon className="size-5" aria-hidden />{n.label}
+            <Link key={n.href} href={n.href} aria-current={active ? "page" : undefined} className={cn(item, active ? "text-ink" : "text-muted")}>
+              {active && <motion.span layoutId="bottom-active" className="absolute inset-0 rounded-[20px] bg-accent-soft" transition={SPRING} />}
+              <n.icon className="relative size-5" strokeWidth={1.75} aria-hidden /><span className="relative">{n.label}</span>
             </Link>
           );
         })}
         <Menu>
-          <MenuTrigger className={cn("flex flex-col items-center justify-center gap-1 text-[10.5px] font-medium", moreActive ? "text-accent-fg" : "text-muted")} aria-label="More sections">
+          <MenuTrigger className={cn(item, "rounded-[20px]", moreActive ? "bg-accent-soft text-ink" : "text-muted")} aria-label="More sections">
             <MoreHorizontal className="size-5" aria-hidden />More
           </MenuTrigger>
           <MenuContent side="top" className="mb-2 w-56">
