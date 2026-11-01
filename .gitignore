@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+master/
+.next/
+__pycache__/
+.env
+.dev_credential_key
+test-results/
+playwright-report/
+apps/web/e2e/.auth/

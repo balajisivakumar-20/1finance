@@ -1,0 +1,26 @@
+<FlexQueryResponse queryName="1Finance" type="AF">
+  <FlexStatements count="1">
+    <FlexStatement accountId="U0000001" fromDate="20260101" toDate="20261030" period="YearToDate" whenGenerated="20261030;230000">
+      <AccountInformation accountId="U0000001" acctAlias="Test Account" currency="EUR" />
+      <CashReport>
+        <CashReportCurrency accountId="U0000001" currency="BASE_SUMMARY" endingCash="1500.25" endingSettledCash="1500.25" />
+        <CashReportCurrency accountId="U0000001" currency="EUR" endingCash="1200.00" endingSettledCash="1200.00" />
+        <CashReportCurrency accountId="U0000001" currency="USD" endingCash="330.50" endingSettledCash="330.50" />
+      </CashReport>
+      <OpenPositions>
+        <OpenPosition accountId="U0000001" currency="USD" assetCategory="STK" symbol="AAPL" description="APPLE INC" isin="US0378331005" listingExchange="NASDAQ" position="10" markPrice="230.10" costBasisMoney="1650.00" costBasisPrice="165.00" reportDate="20261030" levelOfDetail="SUMMARY" />
+        <OpenPosition accountId="U0000001" currency="EUR" assetCategory="STK" symbol="VWCE" description="VANGUARD FTSE ALL-WORLD" isin="IE00BK5BQT80" listingExchange="IBIS2" position="50.5" markPrice="128.42" costBasisMoney="5800.00" costBasisPrice="" reportDate="20261030" levelOfDetail="SUMMARY" />
+        <OpenPosition accountId="U0000001" currency="USD" assetCategory="STK" symbol="AAPL" position="5" markPrice="230.10" levelOfDetail="LOT" />
+      </OpenPositions>
+      <Trades>
+        <Trade accountId="U0000001" currency="EUR" assetCategory="STK" symbol="VWCE" description="VANGUARD FTSE ALL-WORLD" isin="IE00BK5BQT80" tradeID="111" dateTime="20261002;101500" quantity="5" tradePrice="125.00" netCash="-626.25" ibCommission="-1.25" fifoPnlRealized="0" />
+        <Trade accountId="U0000001" currency="USD" assetCategory="STK" symbol="MSFT" description="MICROSOFT" tradeID="112" dateTime="20261005;150000" quantity="-2" tradePrice="430.00" netCash="859.00" ibCommission="-1.00" fifoPnlRealized="120.50" />
+      </Trades>
+      <CashTransactions>
+        <CashTransaction accountId="U0000001" currency="EUR" type="Deposits/Withdrawals" amount="800" dateTime="20261001" transactionID="201" />
+        <CashTransaction accountId="U0000001" currency="USD" type="Dividends" amount="2.60" dateTime="20261014" transactionID="202" />
+        <CashTransaction accountId="U0000001" currency="EUR" type="Deposits/Withdrawals" amount="-100" dateTime="20261020" transactionID="203" />
+      </CashTransactions>
+    </FlexStatement>
+  </FlexStatements>
+</FlexQueryResponse>

@@ -1,0 +1,32 @@
+# Local / private-server stack. For production: set ONEFINANCE_ENV=production, a real CREDENTIAL_KEY,
+# DEMO_MODE=false, ALLOW_MOCK_CONNECTORS=false, and put a TLS-terminating proxy in front of `web`.
+services:
+  db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: onefinance, POSTGRES_PASSWORD: onefinance, POSTGRES_DB: onefinance }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD", "pg_isready", "-U", "onefinance"], interval: 5s, retries: 10 }
+  redis:
+    image: redis:7-alpine
+  api:
+    build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
+    env_file: [apps/api/.env.example]
+    environment:
+      ONEFINANCE_DATABASE_URL: postgresql+psycopg://onefinance:onefinance@db:5432/onefinance
+      ONEFINANCE_REDIS_URL: redis://redis:6379/0
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_started } }
+  worker:
+    build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
+    command: celery -A app.worker worker -B --loglevel=info
+    env_file: [apps/api/.env.example]
+    environment:
+      ONEFINANCE_DATABASE_URL: postgresql+psycopg://onefinance:onefinance@db:5432/onefinance
+      ONEFINANCE_REDIS_URL: redis://redis:6379/0
+    depends_on: [api]
+  web:
+    build: { context: ., dockerfile: infrastructure/docker/web.Dockerfile, args: { ONEFINANCE_API_URL: "http://api:8000" } }
+    environment: { ONEFINANCE_API_URL: "http://api:8000" }
+    ports: ["3000:3000"]
+    depends_on: [api]
+volumes:
+  pgdata:

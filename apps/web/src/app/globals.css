@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- 1Finance design tokens ---------- */
+:root {
+  --bg: #f8fafc;
+  --bg-subtle: #f1f5f9;
+  --card: #ffffff;
+  --card-hover: #fcfdfd;
+  --ink: #111827;
+  --ink-2: #374151;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --line: #e5e7eb;
+  --line-strong: #d1d5db;
+  --accent: #047857;
+  --accent-hover: #065f46;
+  --accent-soft: #ecfdf5;
+  --accent-ink: #ffffff;
+  --teal: #0f766e;
+  --teal-soft: #f0fdfa;
+  --pos: #047857;
+  --pos-soft: #ecfdf5;
+  --neg: #b91c1c;
+  --neg-soft: #fef2f2;
+  --warn: #b45309;
+  --warn-soft: #fffbeb;
+  --info: #1d4ed8;
+  --info-soft: #eff6ff;
+  --ring: rgba(4, 120, 87, 0.35);
+  --shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 1px rgba(17, 24, 39, 0.02);
+  --shadow-lg: 0 10px 30px -12px rgba(17, 24, 39, 0.18), 0 2px 6px rgba(17, 24, 39, 0.05);
+  --chart-1: #047857;
+  --chart-2: #0d9488;
+  --chart-3: #2563eb;
+  --chart-4: #b45309;
+  --chart-5: #7c3aed;
+  --chart-6: #db2777;
+  --chart-7: #0891b2;
+  --chart-8: #64748b;
+  --chart-grid: #eef0f3;
+}
+
+.dark {
+  --bg: #0b0f14;
+  --bg-subtle: #10161d;
+  --card: #151b23;
+  --card-hover: #18202a;
+  --ink: #e8edf2;
+  --ink-2: #c4ccd5;
+  --muted: #8b96a3;
+  --faint: #66717d;
+  --line: #222b36;
+  --line-strong: #2d3845;
+  --accent: #10b981;
+  --accent-hover: #34d399;
+  --accent-soft: rgba(16, 185, 129, 0.12);
+  --accent-ink: #052e22;
+  --teal: #2dd4bf;
+  --teal-soft: rgba(45, 212, 191, 0.1);
+  --pos: #34d399;
+  --pos-soft: rgba(52, 211, 153, 0.12);
+  --neg: #f87171;
+  --neg-soft: rgba(248, 113, 113, 0.12);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.12);
+  --info: #60a5fa;
+  --info-soft: rgba(96, 165, 250, 0.12);
+  --ring: rgba(16, 185, 129, 0.45);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset;
+  --shadow-lg: 0 20px 40px -16px rgba(0, 0, 0, 0.6);
+  --chart-1: #10b981;
+  --chart-2: #2dd4bf;
+  --chart-3: #60a5fa;
+  --chart-4: #fbbf24;
+  --chart-5: #a78bfa;
+  --chart-6: #f472b6;
+  --chart-7: #22d3ee;
+  --chart-8: #94a3b8;
+  --chart-grid: #1c242e;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+  --color-pos: var(--pos);
+  --color-pos-soft: var(--pos-soft);
+  --color-neg: var(--neg);
+  --color-neg-soft: var(--neg-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --shadow-card: var(--shadow);
+  --shadow-pop: var(--shadow-lg);
+  --radius-card: 18px;
+  --animate-fade-in: fade-in 0.25s ease-out;
+  --animate-slide-in: slide-in 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes slide-in {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+::selection { background: var(--accent-soft); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+* { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+
+.skeleton {
+  position: relative; overflow: hidden; background: var(--bg-subtle); border-radius: 8px;
+}
+.skeleton::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: shimmer 1.4s infinite;
+}
+.dark .skeleton::after { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent); }
+
+.recharts-wrapper:focus, .recharts-surface:focus, .recharts-sector:focus { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+.pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
