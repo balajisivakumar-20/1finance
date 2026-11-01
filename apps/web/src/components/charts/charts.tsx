@@ -11,10 +11,10 @@ import { cn } from "@/lib/utils";
 export const PALETTE = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)", "var(--chart-6)", "var(--chart-7)", "var(--chart-8)"];
 
 function TooltipCard({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-xl border border-line bg-card/95 px-3 py-2 text-[12px] shadow-pop backdrop-blur">{children}</div>;
+  return <div className="rounded-xl border border-line bg-card/95 px-3 py-2 text-[13px] shadow-pop backdrop-blur">{children}</div>;
 }
 
-const axisTick = { fill: "var(--faint)", fontSize: 11 };
+const axisTick = { fill: "var(--faint)", fontSize: 12 };
 
 function useCompactTick(currency: string) {
   const hidden = useUi((s) => s.privacy);
@@ -53,7 +53,7 @@ export function NetWorthArea({ points, currency, range, onHover, height = 220 }:
             content={({ active, payload }) => active && payload?.[0] ? (
               <TooltipCard>
                 <p className="text-muted">{formatDate(payload[0].payload.date, "EEE, d MMM yyyy")}</p>
-                <p className="mt-0.5 text-[13px] font-semibold tabular text-ink">{formatMoney(payload[0].payload.raw, currency, { hidden })}</p>
+                <p className="mt-0.5 text-[14px] font-semibold tabular text-ink">{formatMoney(payload[0].payload.raw, currency, { hidden })}</p>
               </TooltipCard>
             ) : null} />
           <Area type="monotone" dataKey="v" stroke={color} strokeWidth={2} fill={`url(#nw-${id})`} isAnimationActive={false}
@@ -123,9 +123,9 @@ export function Donut({ data, currency, centerLabel, centerValue, onSelect, sele
         </PieChart>
       </ResponsiveContainer>
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-        <p className="max-w-[60%] truncate text-[11px] font-medium uppercase tracking-wider text-muted">{active ? active.label : centerLabel}</p>
+        <p className="max-w-[60%] truncate text-[12px] font-medium uppercase tracking-wider text-muted">{active ? active.label : centerLabel}</p>
         <p className="mt-0.5 text-lg font-semibold tabular text-ink">{formatMoney(active ? active.value : centerValue, currency, { hidden, decimals: 0 })}</p>
-        {active && <p className="text-[12px] tabular text-muted">{formatPct(active.share, { decimals: 1 })}</p>}
+        {active && <p className="text-[13px] tabular text-muted">{formatPct(active.share, { decimals: 1 })}</p>}
       </div>
     </div>
   );
@@ -158,7 +158,7 @@ export function CashflowBars({ months, currency, height = 280 }: {
               </TooltipCard>
             ) : null} />
           <Legend verticalAlign="top" align="right" height={28} iconType="circle" iconSize={8}
-            formatter={(v) => <span className="text-[12px] text-ink-2">{v}</span>} />
+            formatter={(v) => <span className="text-[13px] text-ink-2">{v}</span>} />
           <Bar name="Income" dataKey="i" fill="var(--chart-1)" radius={[5, 5, 0, 0]} maxBarSize={22} animationDuration={500} />
           <Bar name="Expenses" dataKey="e" fill="var(--chart-4)" radius={[5, 5, 0, 0]} maxBarSize={22} animationDuration={500} />
         </BarChart>

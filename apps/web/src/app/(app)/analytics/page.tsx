@@ -54,7 +54,7 @@ export default function AnalyticsPage() {
                 <Stat label="Savings rate">{cf.data.totals.savings_rate != null ? formatPct(cf.data.totals.savings_rate, { decimals: 1 }) : "—"}</Stat>
               </div>
               <CashflowBars months={cf.data.months} currency={currency} />
-              <details className="mt-4 rounded-xl bg-bg-subtle px-4 py-3 text-[12.5px] text-ink-2">
+              <details className="mt-4 rounded-xl bg-bg-subtle px-4 py-3 text-[13.5px] text-ink-2">
                 <summary className="flex cursor-pointer items-center gap-2 font-medium"><Info className="size-3.5" />What&apos;s included in these numbers</summary>
                 <dl className="mt-2 space-y-1">{Object.entries(cf.data.definitions).map(([k, v]) => <div key={k}><dt className="inline font-medium capitalize">{k.replace("_", " ")}: </dt><dd className="inline text-muted">{v}</dd></div>)}</dl>
               </details>
@@ -77,10 +77,10 @@ export default function AnalyticsPage() {
                     <div key={g.slug} className="flex items-center gap-3">
                       <CategoryIcon icon={g.icon} color={g.color} size="sm" />
                       <div className="flex-1">
-                        <div className="flex justify-between text-[13px]"><span className="font-medium text-ink">{g.name}</span><Money value={g.amount} currency={currency} className="font-medium" /></div>
+                        <div className="flex justify-between text-[14px]"><span className="font-medium text-ink">{g.name}</span><Money value={g.amount} currency={currency} className="font-medium" /></div>
                         <div className="mt-1 h-1.5 rounded-full bg-bg-subtle"><div className="h-full rounded-full" style={{ width: `${Math.max(1, Number(g.share))}%`, background: g.color ?? "var(--accent)" }} /></div>
                       </div>
-                      <span className="w-10 text-right text-[12px] tabular text-muted">{formatPct(g.share, { decimals: 0 })}</span>
+                      <span className="w-10 text-right text-[13px] tabular text-muted">{formatPct(g.share, { decimals: 0 })}</span>
                     </div>
                   ))}
                 </div>
@@ -94,8 +94,8 @@ export default function AnalyticsPage() {
             {cf.data && topKeys.length ? <StackedCategoryBars months={cf.data.months} keys={topKeys} currency={currency} /> : <Skeleton className="h-72" />}
             {cats.data && (
               <div className="mt-5 max-h-72 overflow-auto rounded-xl border border-line">
-                <table className="w-full text-[13px]">
-                  <thead className="sticky top-0 bg-bg-subtle text-left text-[12px] text-muted"><tr><th className="px-3 py-2 font-medium">Subcategory</th><th className="px-3 py-2 font-medium">Group</th><th className="px-3 py-2 text-right font-medium">Amount</th></tr></thead>
+                <table className="w-full text-[14px]">
+                  <thead className="sticky top-0 bg-bg-subtle text-left text-[13px] text-muted"><tr><th className="px-3 py-2 font-medium">Subcategory</th><th className="px-3 py-2 font-medium">Group</th><th className="px-3 py-2 text-right font-medium">Amount</th></tr></thead>
                   <tbody className="divide-y divide-line">{cats.data.detail.map((d) => <tr key={d.slug}><td className="px-3 py-2">{d.name}</td><td className="px-3 py-2 text-muted">{d.parent}</td><td className="px-3 py-2 text-right"><Money value={d.amount} currency={currency} /></td></tr>)}</tbody>
                 </table>
               </div>
@@ -110,8 +110,8 @@ export default function AnalyticsPage() {
             action={<Segmented label="Comparison" value={nwPeriod} onChange={setNwPeriod} options={[{ value: "monthly", label: "Monthly" }, { value: "quarterly", label: "Quarterly" }, { value: "annual", label: "Annual" }]} />} />
           <CardBody>
             {nw.isLoading ? <Skeleton className="h-60" /> : nw.data && (
-              <div className="overflow-x-auto"><table className="w-full text-[13px]">
-                <thead className="text-left text-[12px] text-muted"><tr><th className="py-2 font-medium">Period end</th><th className="py-2 text-right font-medium">Net worth</th><th className="py-2 text-right font-medium">Change</th></tr></thead>
+              <div className="overflow-x-auto"><table className="w-full text-[14px]">
+                <thead className="text-left text-[13px] text-muted"><tr><th className="py-2 font-medium">Period end</th><th className="py-2 text-right font-medium">Net worth</th><th className="py-2 text-right font-medium">Change</th></tr></thead>
                 <tbody className="divide-y divide-line">{[...nw.data.points].reverse().map((p) => (
                   <tr key={p.date}><td className="py-2.5 text-ink-2">{formatDate(p.date, nwPeriod === "annual" ? "d MMM yyyy" : "MMM yyyy")}</td>
                     <td className="py-2.5 text-right font-medium"><Money value={p.net_worth} currency={currency} /></td>
@@ -132,7 +132,7 @@ export default function AnalyticsPage() {
                 <Stat label="Savings rate">{yr.data.savings_rate ? formatPct(yr.data.savings_rate, { decimals: 1 }) : "—"}</Stat>
                 <Stat label="Investment income" sub="Dividends"><Money value={yr.data.investment_income} currency={currency} /></Stat>
                 <Stat label="Net worth change"><Money value={yr.data.net_worth_change} currency={currency} signed /></Stat>
-                <p className="col-span-2 text-[11.5px] text-faint">{yr.data.coverage_note as string}</p>
+                <p className="col-span-2 text-[12.5px] text-faint">{yr.data.coverage_note as string}</p>
               </div>
             )}
           </CardBody>
