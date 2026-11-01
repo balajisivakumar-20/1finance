@@ -81,8 +81,8 @@ function Sidebar() {
         <AnimatePresence initial={false}>
           {!collapsed && (
             <motion.div key="brand" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -6 }} transition={{ duration: 0.2 }} className="min-w-0 flex-1">
-              <p className="truncate text-[21.5px] font-semibold leading-tight tracking-tight text-ink">1Finance</p>
-              <p className="truncate text-[15.5px] text-muted">Personal finance</p>
+              <p className="truncate text-[17.5px] font-semibold leading-tight tracking-tight text-ink">1Finance</p>
+              <p className="truncate text-[11.5px] text-muted">Personal finance</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -98,7 +98,7 @@ function Sidebar() {
       <nav className={cn("flex-1 overflow-y-auto overflow-x-hidden pb-3", collapsed ? "px-3 pt-3" : "px-4 pt-4")}>
         {SECTIONS.map((section) => (
           <div key={section} className={cn(collapsed ? "space-y-1.5 pb-3" : "pb-4")}>
-            {!collapsed && <p className="px-3 pb-2 pt-1 text-[13.5px] font-semibold uppercase tracking-[0.14em] text-faint">{section}</p>}
+            {!collapsed && <p className="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-faint">{section}</p>}
             <div className="space-y-1">
               {NAV.filter((n) => n.section === section).map((item) => <SideLink key={item.href} item={item} active={isActive(pathname, item.href)} collapsed={collapsed} />)}
             </div>
@@ -117,7 +117,7 @@ function Sidebar() {
 function SideLink({ item, active, collapsed }: { item: NavItem; active: boolean; collapsed: boolean }) {
   const link = (
     <Link href={item.href} aria-current={active ? "page" : undefined} aria-label={collapsed ? item.label : undefined}
-      className={cn("group relative flex items-center gap-3 text-[17.5px] font-medium transition-colors duration-200",
+      className={cn("group relative flex items-center gap-3 text-[13.5px] font-medium transition-colors duration-200",
         collapsed ? "mx-auto size-[52px] justify-center rounded-[18px]" : "h-12 rounded-full px-4",
         active ? "text-ink" : "text-ink-2/80 hover:text-ink")}>
       {active && <motion.span layoutId="nav-active" className="nav-pill absolute inset-0" style={{ borderRadius: collapsed ? 18 : 999 }} transition={SPRING} />}
@@ -275,7 +275,7 @@ function ProfileMenu({ variant }: { variant: "avatar" | "card" }) {
     qc.clear();
     router.replace("/login");
   };
-  const avatar = <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-[16.5px] font-semibold text-accent-fg ring-1 ring-accent/30">{initials}</span>;
+  const avatar = <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-[12.5px] font-semibold text-accent-fg ring-1 ring-accent/30">{initials}</span>;
   return (
     <Menu>
       <MenuTrigger asChild>
@@ -283,8 +283,8 @@ function ProfileMenu({ variant }: { variant: "avatar" | "card" }) {
           <button className="flex w-full items-center gap-3 rounded-[22px] p-2 text-left transition-colors duration-200 hover:bg-card/55" aria-label="Profile menu">
             {avatar}
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[17.5px] font-semibold text-ink">{me?.display_name}</span>
-              <span className="block truncate text-[15px] text-muted">{me?.email}</span>
+              <span className="block truncate text-[13.5px] font-semibold text-ink">{me?.display_name}</span>
+              <span className="block truncate text-[11px] text-muted">{me?.email}</span>
             </span>
             <ChevronsUpDown className="size-4 shrink-0 text-muted" aria-hidden />
           </button>
