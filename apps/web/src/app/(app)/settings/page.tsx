@@ -197,7 +197,7 @@ function Security() {
           <KeyRound className="size-5 text-ink-2" /><div className="flex-1"><p className="font-medium text-ink">Passkeys</p><p className="text-[15px] text-muted">Available once the server is configured with an HTTPS origin and relying-party ID.</p></div>
           <Badge tone="outline">Not configured</Badge>
         </div>
-        <p className="text-[15px] text-muted">Sessions expire after 30 minutes of inactivity and 12 hours in total.</p>
+        <p className="text-[15px] text-muted">You stay signed in on each device for up to 30 days, or until you sign out. Devices unused for 14 days are signed out automatically.</p>
       </CardBody></Card>
       <Card><CardHeader title="Active sessions" action={<Button size="sm" onClick={() => revokeOthers.mutate()}><LogOut />Sign out other devices</Button>} /><CardBody>
         <ul className="divide-y divide-line">{sessions.data?.map((s) => (
