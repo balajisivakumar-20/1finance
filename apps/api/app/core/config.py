@@ -12,8 +12,9 @@ class Settings(BaseSettings):
     # 32-byte base64 key for AES-256-GCM credential encryption. MUST be set in production (KMS/Vault-backed).
     credential_key: str = ""
     cors_origins: list[str] = ["http://localhost:3000"]
-    session_idle_minutes: int = 30
-    session_absolute_hours: int = 12
+    # Stay signed in across visits: signed out after 14 days without use, re-confirm sign-in every 30 days.
+    session_idle_minutes: int = 14 * 24 * 60
+    session_absolute_hours: int = 30 * 24
     cookie_secure: bool = False  # True behind HTTPS (forced in production)
     demo_mode: bool = True  # seeds clearly-labeled demo data; must be False in production
     allow_mock_connectors: bool = True  # mock connectors are never registered in production
