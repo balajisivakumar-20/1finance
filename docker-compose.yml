@@ -10,7 +10,7 @@ services:
     image: redis:7-alpine
   api:
     build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
-    env_file: [apps/api/.env.example]
+    env_file: [apps/api/.env]
     environment:
       ONEFINANCE_DATABASE_URL: postgresql+psycopg://onefinance:onefinance@db:5432/onefinance
       ONEFINANCE_REDIS_URL: redis://redis:6379/0
@@ -18,7 +18,7 @@ services:
   worker:
     build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
     command: celery -A app.worker worker -B --loglevel=info
-    env_file: [apps/api/.env.example]
+    env_file: [apps/api/.env]
     environment:
       ONEFINANCE_DATABASE_URL: postgresql+psycopg://onefinance:onefinance@db:5432/onefinance
       ONEFINANCE_REDIS_URL: redis://redis:6379/0
