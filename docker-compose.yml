@@ -26,7 +26,7 @@ services:
   web:
     build: { context: ., dockerfile: infrastructure/docker/web.Dockerfile, args: { ONEFINANCE_API_URL: "http://api:8000" } }
     environment: { ONEFINANCE_API_URL: "http://api:8000" }
-    ports: ["3000:3000"]
+    ports: ["127.0.0.1:3000:3000"]  # reachable from this computer only
     depends_on: [api]
 volumes:
   pgdata:

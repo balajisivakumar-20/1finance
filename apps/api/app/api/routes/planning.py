@@ -105,9 +105,10 @@ def delete_budget(bid: int, user: User = Depends(current_user), db: Session = De
 
 # ------------------------------------------------------------------ goals
 @router.get("/goals")
-def goals(user: User = Depends(current_user), db: Session = Depends(get_db)):
+def goals(user: User = Depends(current_user), db: Session = Depends(get_db), base: str = Depends(base_currency)):
     today = _today()
     fx = load_fx(db)
+    now = datetime.now(timezone.utc)
     out = []
     linked: dict[int, list[str]] = {}
     for g in db.scalars(select(Goal).where(Goal.user_id == user.id).order_by(Goal.created_at)):
@@ -115,7 +116,7 @@ def goals(user: User = Depends(current_user), db: Session = Depends(get_db)):
         cur = ZERO
         series, entries = [], []
         for c in contribs:
-            cur += to_base(fx, c.amount, c.currency, g.target_currency, datetime.now(timezone.utc)) or ZERO
+            cur += to_base(fx, c.amount, c.currency, g.target_currency, now) or ZERO
             series.append({"date": c.contribution_date, "amount": m(cur, g.target_currency)})
             entries.append({"id": c.id, "date": c.contribution_date, "amount": m(c.amount, c.currency), "currency": c.currency, "note": c.note})
         if g.linked_account_id:
@@ -132,9 +133,22 @@ def goals(user: User = Depends(current_user), db: Session = Depends(get_db)):
                     "remaining": m(remaining, g.target_currency), "progress_pct": pct(min(cur / g.target_amount * 100, Decimal(100))),
                     "monthly_plan": m(g.monthly_contribution_plan, g.target_currency), "estimated_completion": eta,
                     "on_track": None if not (eta and g.target_date) else eta <= g.target_date,
-                    "linked_account_id": g.linked_account_id, "history": series, "contributions": entries[::-1]})
+                    "linked_account_id": g.linked_account_id, "history": series, "contributions": entries[::-1],
+                    "display": _goal_display(fx, g.target_currency, base, now, target=g.target_amount, current=cur,
+                                             remaining=remaining, monthly_plan=g.monthly_contribution_plan,
+                                             history=[(p["date"], p["amount"]) for p in series])})
     overlaps = [{"account_id": k, "goals": v} for k, v in linked.items() if len(v) > 1]
     return {"items": out, "overlaps": overlaps}
+
+
+def _goal_display(fx, cur: str, base: str, at: datetime, history: list, **amounts) -> dict | None:
+    """The goal's figures in the reporting currency. Goals keep their own currency; this is for viewing only."""
+    rate = to_base(fx, Decimal(1), cur, base, at)
+    if rate is None:
+        return None
+    conv = lambda v: m(v * rate, base) if v is not None else None  # noqa: E731
+    return {"currency": base, **{k: conv(v) for k, v in amounts.items()},
+            "history": [{"date": d, "amount": conv(v)} for d, v in history]}
 
 
 class GoalIn(BaseModel):

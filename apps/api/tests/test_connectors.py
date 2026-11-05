@@ -118,3 +118,62 @@ def test_csv_unknown_format():
 def test_generic_csv():
     r = parse_csv(b"date,description,amount,currency\n2026-01-05,Coffee,-3.50,eur\n", "a")
     assert r.rows[0].currency == "EUR" and r.rows[0].type_hint == "expense"
+
+
+def test_flex_day_first_dates_give_one_snapshot():
+    # dd/MM/yyyy query settings (04/11/2026 = 4 Nov): every position and cash row must share one timestamp
+    xml = """<FlexQueryResponse><FlexStatements count="1">
+      <FlexStatement accountId="U1" fromDate="01/01/2026" toDate="04/11/2026" whenGenerated="05/11/2026;050326">
+        <CashReport>
+          <CashReportCurrency currency="BASE_SUMMARY" endingCash="10.06"/>
+          <CashReportCurrency currency="EUR" endingCash="10.06"/>
+          <CashReportCurrency currency="USD" endingCash="0"/>
+        </CashReport>
+        <OpenPositions>
+          <OpenPosition currency="USD" assetCategory="STK" symbol="AMD" position="4" markPrice="488.78" levelOfDetail="SUMMARY" reportDate="04/11/2026"/>
+          <OpenPosition currency="USD" assetCategory="STK" symbol="NVDA" position="7" markPrice="200.13" levelOfDetail="SUMMARY" reportDate="04/11/2026"/>
+        </OpenPositions>
+      </FlexStatement></FlexStatements></FlexQueryResponse>"""
+    from datetime import datetime, timezone
+    from unittest.mock import patch
+
+    with patch("app.connectors.ibkr_flex.datetime", wraps=datetime) as dt:
+        dt.now.return_value = datetime(2026, 11, 5, 6, tzinfo=timezone.utc)
+        p = FlexStatementParser(xml)
+    stamps = {b.as_of for b in p.cash_balances()} | {h.as_of for h in p.holdings()}
+    assert stamps == {datetime(2026, 11, 4, tzinfo=timezone.utc)}
+
+
+def test_flex_date_formats():
+    from datetime import datetime, timezone
+
+    from app.connectors.ibkr_flex import _dt
+
+    d = datetime(2026, 11, 4, tzinfo=timezone.utc)
+    assert _dt("20261104") == _dt("2026-11-04") == _dt("11/04/2026") == _dt("04/11/2026", day_first=True) == _dt("04-Nov-26") == d
+    assert _dt("05/11/2026;050326", day_first=True) == datetime(2026, 11, 5, 5, 3, 26, tzinfo=timezone.utc)
+    assert _dt("2026-11-04 15:30:00") == datetime(2026, 11, 4, 15, 30, tzinfo=timezone.utc)
+
+
+def test_flex_cost_basis_and_realized_from_trades_when_ibkr_reports_zero():
+    xml = """<FlexQueryResponse><FlexStatements count="1">
+      <FlexStatement accountId="U1" toDate="20261104" whenGenerated="20261105;050326">
+        <OpenPositions>
+          <OpenPosition currency="USD" assetCategory="STK" symbol="AMD" position="4" markPrice="488.78" costBasisPrice="0" costBasisMoney="0" levelOfDetail="SUMMARY"/>
+          <OpenPosition currency="USD" assetCategory="STK" symbol="OLD" position="5" markPrice="10" costBasisPrice="0" levelOfDetail="SUMMARY"/>
+        </OpenPositions>
+        <Trades>
+          <Trade tradeID="1" assetCategory="STK" symbol="AMD" currency="USD" quantity="6" netCash="-601" fifoPnlRealized="0" levelOfDetail="EXECUTION" tradeDate="20260301"/>
+          <Trade tradeID="2" assetCategory="STK" symbol="AMD" currency="USD" quantity="-2" netCash="299" fifoPnlRealized="0" levelOfDetail="EXECUTION" tradeDate="20260401"/>
+          <Trade tradeID="3" assetCategory="STK" symbol="OLD" currency="USD" quantity="-1" netCash="10" fifoPnlRealized="0" levelOfDetail="EXECUTION" tradeDate="20260301"/>
+          <Trade tradeID="4" assetCategory="CASH" symbol="EUR.USD" currency="USD" quantity="-500" netCash="0" levelOfDetail="EXECUTION" tradeDate="20260301"/>
+        </Trades>
+      </FlexStatement></FlexStatements></FlexQueryResponse>"""
+    p = FlexStatementParser(xml)
+    h = {x.security.ticker: x for x in p.holdings()}
+    assert h["AMD"].average_price == D("601") / 6  # bought 6 for 601 incl. commission; selling 2 keeps the average
+    assert h["OLD"].average_price == 0  # sold before any buy in the statement: history incomplete, so no guess
+    acts = {a.external_id: a for a in p.activity()}
+    assert "4" not in acts  # currency conversions are not investment trades
+    assert acts["2"].realized_pl == D("299") - D("601") * 2 / 6
+    assert acts["3"].realized_pl is None

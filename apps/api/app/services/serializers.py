@@ -10,20 +10,26 @@ from app.services.ledger import LIABILITY_ACCOUNT_TYPES, STALE_AFTER, Ledger, to
 
 
 def account_out(a: Account, ledger: Ledger, conn: Connection | None, base: str, now: datetime) -> dict:
-    snap = ledger.latest_balance(a.id)
+    snaps = ledger.latest_balances(a.id)
     holdings = ledger.latest_holdings(a.id)
-    cash = snap.balance if snap else Decimal(0)
-    cash_cur = snap.currency if snap else a.currency
+    # cash may be held in several currencies; it is shown in the account's currency (the UI labels it that way)
+    cash: Decimal | None = Decimal(0)
+    for b in snaps:
+        v = to_base(ledger.fx, b.balance, b.currency, a.currency, now)
+        cash = None if v is None or cash is None else cash + v
     inv_local = sum((h.market_value for h in holdings if h.currency == a.currency), Decimal(0))
     # total in base = cash + all holdings (each converted from its own currency)
-    total_base = to_base(ledger.fx, cash, cash_cur, base, now) if snap else Decimal(0)
+    total_base = Decimal(0)
+    for b in snaps:
+        v = to_base(ledger.fx, b.balance, b.currency, base, now)
+        total_base = None if v is None or total_base is None else total_base + v
     for h in holdings:
         v = to_base(ledger.fx, h.market_value, h.currency, base, now)
         total_base = None if v is None or total_base is None else total_base + v
     if a.account_type in LIABILITY_ACCOUNT_TYPES and total_base is not None:
         total_base = -abs(total_base)
     total_local = to_base(ledger.fx, total_base, base, a.currency, now) if total_base is not None else None
-    last_ts = max(([snap.valuation_timestamp] if snap else []) + [h.valuation_timestamp for h in holdings], default=None)
+    last_ts = max([b.valuation_timestamp for b in snaps] + [h.valuation_timestamp for h in holdings], default=None)
     status = conn.connection_status if conn else "manual"
     return {
         "id": a.id,
@@ -37,7 +43,7 @@ def account_out(a: Account, ledger: Ledger, conn: Connection | None, base: str, 
         "currency": a.currency,
         "masked_reference": mask_reference(a.external_account_reference),
         "balance": m(total_local, a.currency),
-        "cash_balance": m(cash, cash_cur),
+        "cash_balance": m(cash, a.currency),
         "investments_value_local": m(inv_local, a.currency) if holdings else None,
         "balance_base": m(total_base, base),
         "base_currency": base,

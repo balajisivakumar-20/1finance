@@ -73,10 +73,11 @@ class Ledger:
         self.accounts = {a.id: a for a in db.scalars(q)}
         ids = list(self.accounts)
         self.fx = load_fx(db)
-        bal: dict[int, list] = defaultdict(list)
+        # A sync can report cash in several currencies at once, so each point holds every snapshot taken at that time.
+        bal: dict[int, dict[datetime, list]] = defaultdict(lambda: defaultdict(list))
         for s in db.scalars(select(AccountBalanceSnapshot).where(AccountBalanceSnapshot.account_id.in_(ids))):
-            bal[s.account_id].append((s.valuation_timestamp, s))
-        self.balances = {k: _series(v) for k, v in bal.items()}
+            bal[s.account_id][s.valuation_timestamp].append(s)
+        self.balances = {k: _series(list(v.items())) for k, v in bal.items()}
         hold: dict[int, dict[datetime, list]] = defaultdict(lambda: defaultdict(list))
         for h in db.scalars(select(HoldingSnapshot).where(HoldingSnapshot.account_id.in_(ids))):
             hold[h.account_id][h.valuation_timestamp].append(h)
@@ -105,14 +106,16 @@ class Ledger:
                 continue
             b = _at(self.balances.get(a.id), at)
             if b:
-                ts, snap = b
+                ts, snaps = b
                 if at - ts > STALE_AFTER:
                     meta["stale_accounts"].append(a.id)
-                if a.account_type in LIABILITY_ACCOUNT_TYPES:
-                    pos.append(Position(f"acct:{a.id}", LIABILITY, a.account_type, Money(-snap.balance, snap.currency), a.is_demo))
-                else:
-                    pos.append(Position(f"acct:{a.id}", ASSET, ACCOUNT_BUCKET.get(a.account_type, "other_assets"),
-                                        Money(snap.balance, snap.currency), a.is_demo))
+                for snap in snaps:
+                    if a.account_type in LIABILITY_ACCOUNT_TYPES:
+                        pos.append(Position(f"acct:{a.id}:{snap.currency}", LIABILITY, a.account_type,
+                                            Money(-snap.balance, snap.currency), a.is_demo))
+                    else:
+                        pos.append(Position(f"acct:{a.id}:{snap.currency}", ASSET, ACCOUNT_BUCKET.get(a.account_type, "other_assets"),
+                                            Money(snap.balance, snap.currency), a.is_demo))
             h = _at(self.holdings.get(a.id), at)
             if h:
                 _, rows = h
@@ -149,9 +152,13 @@ class Ledger:
             out.append({"date": end.isoformat(), "assets": r.total_assets, "liabilities": r.total_liabilities, "net_worth": r.net_worth})
         return out
 
-    def latest_balance(self, account_id: int):
+    def latest_balances(self, account_id: int) -> list[AccountBalanceSnapshot]:
         s = self.balances.get(account_id)
-        return s.values[-1] if s and s.values else None
+        return s.values[-1] if s and s.values else []
+
+    def balances_at(self, account_id: int, at: datetime) -> list[AccountBalanceSnapshot]:
+        r = _at(self.balances.get(account_id), at)
+        return r[1] if r else []
 
     def latest_holdings(self, account_id: int) -> list[HoldingSnapshot]:
         s = self.holdings.get(account_id)

@@ -42,16 +42,27 @@ def _d(v: str | None) -> Decimal | None:
         return None
 
 
-def _dt(v: str | None) -> datetime | None:
+def _dt(v: str | None, day_first: bool = False) -> datetime | None:
+    """Parse any Flex date setting: yyyyMMdd, yyyy-MM-dd, MM/dd/yyyy, dd/MM/yyyy, dd-MMM-yy …, optionally with a time."""
     if not v:
         return None
-    v = v.replace(";", " ").strip()
-    for fmt in ("%Y%m%d %H%M%S", "%Y-%m-%d %H:%M:%S", "%Y%m%d", "%Y-%m-%d"):
+    day, _, clock = v.replace(";", " ").strip().partition(" ")
+    slash = ["%d/%m/%Y", "%d/%m/%y", "%m/%d/%Y", "%m/%d/%y"]
+    for fmt in ("%Y%m%d", "%Y-%m-%d", *(slash if day_first else slash[2:] + slash[:2]), "%d-%b-%y", "%d-%b-%Y"):
         try:
-            return datetime.strptime(v, fmt).replace(tzinfo=timezone.utc)
+            d = datetime.strptime(day, fmt)
+            break
         except ValueError:
             continue
-    return None
+    else:
+        return None
+    for fmt in ("%H%M%S", "%H:%M:%S", "%H:%M"):
+        try:
+            d = datetime.combine(d.date(), datetime.strptime(clock.strip(), fmt).time())
+            break
+        except ValueError:
+            continue
+    return d.replace(tzinfo=timezone.utc)
 
 
 class FlexStatementParser:
@@ -62,6 +73,51 @@ class FlexStatementParser:
         self.statements = self.root.findall(".//FlexStatement")
         if not self.statements:
             raise ConnectorError("Flex response contained no statements — check the query configuration")
+        self.now = datetime.now(timezone.utc)
+        self.day_first = self._detect_day_first()
+
+    def _detect_day_first(self) -> bool:
+        """04/11/2026 is ambiguous; the reading that puts the generation time closest to now is the query's format."""
+        for st in self.statements:
+            stamp = st.get("whenGenerated") or st.get("toDate")
+            a, b = _dt(stamp, True), _dt(stamp, False)
+            if a and b and a != b:
+                return abs(a - self.now) < abs(b - self.now)
+        return False
+
+    def _dt(self, v: str | None) -> datetime | None:
+        return _dt(v, self.day_first)
+
+    def _book(self, st: ET.Element) -> tuple[dict, dict]:
+        """Average-cost book rebuilt from the statement's trades, for accounts where IBKR reports cost/realized P&L as 0.
+
+        Returns ({(symbol, currency): (quantity, total cost)} for positions whose full history is in the statement,
+        {trade id: realized P&L} for sells of those positions)."""
+        trades = [t for t in st.findall("Trades/Trade")
+                  if t.get("assetCategory") != "CASH" and t.get("levelOfDetail", "EXECUTION") == "EXECUTION"]
+        trades.sort(key=lambda t: self._dt(t.get("dateTime") or t.get("tradeDate")) or self.now)
+        held: dict[tuple, list] = {}
+        realized: dict[str, Decimal] = {}
+        broken: set[tuple] = set()  # sold more than the statement shows being bought: history starts earlier
+        for t in trades:
+            key, qty = (t.get("symbol"), t.get("currency")), _d(t.get("quantity"))
+            net = _d(t.get("netCash"))
+            if qty is None or net is None or key in broken:
+                continue
+            q, cost = held.setdefault(key, [Decimal(0), Decimal(0)])
+            if qty > 0:
+                held[key] = [q + qty, cost - net]  # netCash is negative for a buy and includes commission
+            elif -qty > q:
+                broken.add(key)
+            else:
+                part = cost * (-qty) / q
+                realized[t.get("tradeID") or t.get("transactionID") or ""] = net - part
+                held[key] = [q + qty, cost - part]
+        return {k: (q, c) for k, (q, c) in held.items() if k not in broken}, realized
+
+    def _as_of(self, st: ET.Element) -> datetime:
+        # one timestamp per statement, so all of its balances and positions form a single snapshot
+        return self._dt(st.get("toDate")) or self._dt(st.get("whenGenerated")) or self.now
 
     def accounts(self) -> list[AccountData]:
         out = []
@@ -76,7 +132,7 @@ class FlexStatementParser:
     def cash_balances(self) -> list[BalanceData]:
         out = []
         for st in self.statements:
-            acct, as_of = st.get("accountId", ""), _dt(st.get("toDate")) or datetime.now(timezone.utc)
+            acct, as_of = st.get("accountId", ""), self._as_of(st)
             for row in st.findall("CashReport/CashReportCurrency"):
                 cur = row.get("currency")
                 if not cur or cur == "BASE_SUMMARY":
@@ -89,7 +145,8 @@ class FlexStatementParser:
     def holdings(self) -> list[HoldingData]:
         out = []
         for st in self.statements:
-            acct = st.get("accountId", "")
+            acct, as_of = st.get("accountId", ""), self._as_of(st)
+            book, _ = self._book(st)
             for p in st.findall("OpenPositions/OpenPosition"):
                 if p.get("levelOfDetail", "SUMMARY") not in ("SUMMARY", ""):
                     continue
@@ -97,14 +154,16 @@ class FlexStatementParser:
                 if qty is None or mark is None:
                     continue
                 cost_basis = _d(p.get("costBasisMoney"))
-                avg = _d(p.get("costBasisPrice")) or ((cost_basis / qty) if cost_basis is not None and qty else Decimal(0))
+                avg = _d(p.get("costBasisPrice")) or ((cost_basis / qty) if cost_basis and qty else Decimal(0))
                 cur = p.get("currency", "USD")
+                bq, bc = book.get((p.get("symbol"), cur), (None, None))
+                if not avg and bq and abs(bq - qty) < Decimal("0.0001"):
+                    avg = bc / bq
                 sec = SecurityData(
                     ticker=p.get("symbol", "?"), name=p.get("description") or p.get("symbol", "?"),
                     asset_class=ASSET_CLASS.get(p.get("assetCategory", ""), "other"), currency=cur,
                     isin=p.get("isin") or None, exchange=p.get("listingExchange") or None,
                 )
-                as_of = _dt(p.get("reportDate")) or _dt(st.get("toDate")) or datetime.now(timezone.utc)
                 out.append(HoldingData(acct, sec, qty, avg, mark, cur, as_of, "close"))
         return out
 
@@ -112,18 +171,21 @@ class FlexStatementParser:
         out = []
         for st in self.statements:
             acct = st.get("accountId", "")
+            _, realized = self._book(st)
             for t in st.findall("Trades/Trade"):
                 qty, price = _d(t.get("quantity")), _d(t.get("tradePrice"))
-                if qty is None:
+                if qty is None or t.get("assetCategory") == "CASH":  # currency conversions, not investments
                     continue
+                tid = t.get("tradeID") or t.get("transactionID")
+                pnl = _d(t.get("fifoPnlRealized")) or (realized.get(tid) if qty < 0 else None)
                 cur = t.get("currency", "USD")
                 sec = SecurityData(t.get("symbol", "?"), t.get("description") or t.get("symbol", "?"),
                                    ASSET_CLASS.get(t.get("assetCategory", ""), "other"), cur, t.get("isin") or None,
                                    t.get("listingExchange") or None)
                 out.append(InvestmentActivityData(
-                    acct, t.get("tradeID") or t.get("transactionID"), "buy" if qty > 0 else "sell",
-                    _d(t.get("netCash")) or Decimal(0), cur, _dt(t.get("dateTime") or t.get("tradeDate")) or datetime.now(timezone.utc),
-                    sec, abs(qty), price, abs(_d(t.get("ibCommission")) or Decimal(0)), _d(t.get("fifoPnlRealized")),
+                    acct, tid, "buy" if qty > 0 else "sell",
+                    _d(t.get("netCash")) or Decimal(0), cur, self._dt(t.get("dateTime") or t.get("tradeDate")) or self.now,
+                    sec, abs(qty), price, abs(_d(t.get("ibCommission")) or Decimal(0)), pnl,
                 ))
             kinds = {"Dividends": "dividend", "Payment In Lieu Of Dividends": "dividend", "Withholding Tax": "fee",
                      "Deposits/Withdrawals": "deposit", "Broker Interest Received": "interest",
@@ -136,7 +198,7 @@ class FlexStatementParser:
                 if kind == "deposit" and amt < 0:
                     kind = "withdrawal"
                 out.append(InvestmentActivityData(acct, c.get("transactionID"), kind, amt, c.get("currency", "USD"),
-                                                  _dt(c.get("dateTime") or c.get("settleDate")) or datetime.now(timezone.utc)))
+                                                  self._dt(c.get("dateTime") or c.get("settleDate")) or self.now))
         return out
 
 
