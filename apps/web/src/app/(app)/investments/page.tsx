@@ -156,18 +156,22 @@ export default function InvestmentsPage() {
       </div>
 
       <Card className="overflow-hidden">
-        <CardHeader title="Holdings" description={`${rows.length} positions · values in trading currency unless noted`} />
+        <CardHeader title="Holdings" description={`${rows.length} positions · shown in ${currency}, converted at today's rate`} />
         <div className="mt-4 overflow-x-auto">
           {holdings.isError ? <ErrorState error={holdings.error} retry={holdings.refetch} /> : (
             <table className="w-full min-w-[960px] text-[15.5px]">
               <thead className="border-y border-line bg-bg-subtle/60 text-left text-[14.5px] text-muted">
-                <tr>{th("name", "Asset", false)}{th("brokerage", "Broker", false)}{th("quantity", "Qty")}{th("average_price", "Avg price")}{th("current_price", "Price")}
-                  {th("market_value", "Value")}{th("unrealized", "Unrealized P/L")}{th("allocation_pct", "Alloc.")}{th("market_value_base", `Value (${currency})`)}</tr>
+                <tr>{th("name", "Asset", false)}{th("brokerage", "Broker", false)}{th("quantity", "Qty")}{th("average_price_display", "Avg price")}{th("current_price_display", "Price")}
+                  {th("unrealized_display", "Unrealized P/L")}{th("allocation_pct", "Alloc.")}{th("market_value_base", "Value")}</tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {holdings.isLoading && Array.from({ length: 6 }).map((_, i) => <tr key={i}><td colSpan={9} className="px-4 py-3"><Skeleton className="h-8" /></td></tr>)}
+                {holdings.isLoading && Array.from({ length: 6 }).map((_, i) => <tr key={i}><td colSpan={8} className="px-4 py-3"><Skeleton className="h-8" /></td></tr>)}
                 {rows.map((h) => {
                   const up = Number(h.unrealized) >= 0;
+                  // converted figures, falling back to the trading currency if there is no rate
+                  const conv = h.market_value_base !== null && h.current_price_display !== null;
+                  const cur = conv ? currency : h.currency;
+                  const pick = (display: MoneyStr | null, native: MoneyStr) => (conv ? display : native);
                   return (
                     <tr key={`${h.account_id}-${h.security_id}`} tabIndex={0} onClick={() => setDetail(h)} onKeyDown={(e) => e.key === "Enter" && setDetail(h)} className="cursor-pointer hover:bg-bg-subtle/70">
                       <td className="px-4 py-3">
@@ -179,15 +183,16 @@ export default function InvestmentsPage() {
                       </td>
                       <td className="px-4 py-3 text-ink-2">{h.brokerage}</td>
                       <td className="px-4 py-3 text-right tabular">{formatQty(h.quantity)}</td>
-                      <td className="px-4 py-3 text-right"><Money value={h.average_price} currency={h.currency} /></td>
-                      <td className="px-4 py-3 text-right"><Money value={h.current_price} currency={h.currency} />{h.is_stale && <Badge tone="warn" className="ml-1">Stale</Badge>}</td>
-                      <td className="px-4 py-3 text-right font-medium"><Money value={h.market_value} currency={h.currency} /></td>
+                      <td className="px-4 py-3 text-right"><Money value={pick(h.average_price_display, h.average_price)} currency={cur} /></td>
+                      <td className="px-4 py-3 text-right"><Money value={pick(h.current_price_display, h.current_price)} currency={cur} />{h.is_stale && <Badge tone="warn" className="ml-1">Stale</Badge>}
+                        {conv && h.currency !== currency && <span className="block text-[14px] text-faint"><Money value={h.current_price} currency={h.currency} /></span>}</td>
                       <td className={cn("px-4 py-3 text-right", up ? "text-pos" : "text-neg")}>
-                        <span className="inline-flex items-center gap-0.5 whitespace-nowrap">{up ? <ArrowUp className="size-3" aria-label="gain" /> : <ArrowDown className="size-3" aria-label="loss" />}<Money value={h.unrealized} currency={h.currency} signed /></span>
+                        <span className="inline-flex items-center gap-0.5 whitespace-nowrap">{up ? <ArrowUp className="size-3" aria-label="gain" /> : <ArrowDown className="size-3" aria-label="loss" />}<Money value={pick(h.unrealized_display, h.unrealized)} currency={cur} signed /></span>
                         <span className="block text-[14px]">{formatPct(h.unrealized_pct, { signed: true })}</span>
                       </td>
                       <td className="px-4 py-3 text-right tabular text-muted">{formatPct(h.allocation_pct, { decimals: 1 })}</td>
-                      <td className="px-4 py-3 text-right font-medium"><Money value={h.market_value_base} currency={currency} /></td>
+                      <td className="px-4 py-3 text-right font-medium"><Money value={pick(h.market_value_base, h.market_value)} currency={cur} />
+                        {conv && h.currency !== currency && <span className="block text-[14px] font-normal text-faint"><Money value={h.market_value} currency={h.currency} /></span>}</td>
                     </tr>
                   );
                 })}
@@ -214,26 +219,33 @@ function HoldingDetail({ holding, onClose }: { holding: Holding | null; onClose:
     queryFn: () => api<{ security: { name: string; ticker: string; isin: string | null; asset_class: string; exchange: string | null; sector: string | null };
       quantity: string; average_price: string; current_price: string; price_type: string; valuation_timestamp: string; market_value: string; total_invested: string;
       unrealized: string; unrealized_pct: string; currency: string; dividends_total: string; price_history: { date: string; price: string }[];
+      display: { currency: string; average_price: string | null; current_price: string | null; market_value: string | null; total_invested: string | null;
+        unrealized: string | null; dividends_total: string; price_history: { date: string; price: string | null }[]; activity: { price: string | null; amount: string | null }[] };
       activity: { date: string; type: string; quantity: string | null; price: string | null; amount: string; currency: string }[] }>(`/investments/holdings/${holding!.security_id}${qs({ account_id: holding!.account_id, currency })}`),
     enabled: !!holding,
   });
   return (
     <Sheet open={!!holding} onOpenChange={(o) => !o && onClose()} wide title={holding?.name ?? ""} description={holding ? `${holding.ticker} · ${holding.brokerage}` : undefined}>
-      {isLoading || !data ? <Skeleton className="h-64" /> : (
+      {isLoading || !data ? <Skeleton className="h-64" /> : (() => {
+        // shown in the reporting currency when every figure converts; otherwise in the trading currency
+        const d = data.display, conv = d.market_value !== null && d.current_price !== null;
+        const cur = conv ? d.currency : data.currency;
+        const v = (display: string | null, native: string) => (conv ? display ?? native : native);
+        return (
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            <Stat label="Market value"><Money value={data.market_value} currency={data.currency} /></Stat>
-            <Stat label="Total invested"><Money value={data.total_invested} currency={data.currency} /></Stat>
-            <Stat label="Unrealized"><span className={Number(data.unrealized) >= 0 ? "text-pos" : "text-neg"}><Money value={data.unrealized} currency={data.currency} signed /></span></Stat>
+            <Stat label="Market value" sub={conv && cur !== data.currency ? <Money value={data.market_value} currency={data.currency} /> : undefined}><Money value={v(d.market_value, data.market_value)} currency={cur} /></Stat>
+            <Stat label="Total invested"><Money value={v(d.total_invested, data.total_invested)} currency={cur} /></Stat>
+            <Stat label="Unrealized"><span className={Number(data.unrealized) >= 0 ? "text-pos" : "text-neg"}><Money value={v(d.unrealized, data.unrealized)} currency={cur} signed /></span></Stat>
             <Stat label="Quantity">{formatQty(data.quantity)}</Stat>
-            <Stat label="Average price"><Money value={data.average_price} currency={data.currency} /></Stat>
-            <Stat label="Current price" sub={<span className="inline-flex items-center gap-1"><PriceTypeBadge type={data.price_type} />{formatDate(data.valuation_timestamp, "d MMM HH:mm")}</span>}><Money value={data.current_price} currency={data.currency} /></Stat>
+            <Stat label="Average price"><Money value={v(d.average_price, data.average_price)} currency={cur} /></Stat>
+            <Stat label="Current price" sub={<span className="inline-flex items-center gap-1"><PriceTypeBadge type={data.price_type} />{formatDate(data.valuation_timestamp, "d MMM HH:mm")}</span>}><Money value={v(d.current_price, data.current_price)} currency={cur} /></Stat>
           </div>
           <div className="h-40">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.price_history.map((p) => ({ ...p, v: Number(p.price) }))}>
+              <AreaChart data={data.price_history.map((p, i) => ({ date: p.date, price: v(d.price_history[i]?.price ?? null, p.price), v: Number(v(d.price_history[i]?.price ?? null, p.price)) }))}>
                 <YAxis hide domain={["auto", "auto"]} /><XAxis dataKey="date" hide />
-                <Tooltip content={({ active, payload }) => active && payload?.[0] ? <div className="rounded-lg border border-line bg-card px-2 py-1 text-[14.5px]">{formatDate(payload[0].payload.date)} · {formatMoney(payload[0].payload.price, data.currency, { hidden })}</div> : null} />
+                <Tooltip content={({ active, payload }) => active && payload?.[0] ? <div className="rounded-lg border border-line bg-card px-2 py-1 text-[14.5px]">{formatDate(payload[0].payload.date)} · {formatMoney(payload[0].payload.price, cur, { hidden })}</div> : null} />
                 <Area dataKey="v" stroke="var(--chart-3)" fill="var(--chart-3)" fillOpacity={0.08} strokeWidth={1.75} />
               </AreaChart>
             </ResponsiveContainer>
@@ -242,7 +254,7 @@ function HoldingDetail({ holding, onClose }: { holding: Holding | null; onClose:
             <dt className="text-muted">ISIN</dt><dd className="text-right font-mono text-[14.5px]">{data.security.isin ?? "—"}</dd>
             <dt className="text-muted">Exchange</dt><dd className="text-right">{data.security.exchange ?? "—"}</dd>
             <dt className="text-muted">Asset class</dt><dd className="text-right">{labelize(data.security.asset_class)}</dd>
-            <dt className="text-muted">Dividends (recorded)</dt><dd className="text-right"><Money value={data.dividends_total} currency={data.currency} /></dd>
+            <dt className="text-muted">Dividends (recorded)</dt><dd className="text-right"><Money value={conv ? d.dividends_total : data.dividends_total} currency={cur} /></dd>
           </dl>
           <div>
             <p className="mb-2 text-[14.5px] font-semibold uppercase tracking-wider text-muted">Activity</p>
@@ -251,14 +263,15 @@ function HoldingDetail({ holding, onClose }: { holding: Holding | null; onClose:
                 {data.activity.map((a, i) => (
                   <li key={i} className="flex items-center justify-between py-2">
                     <span><Badge tone={a.type === "buy" ? "info" : a.type === "dividend" ? "pos" : "neutral"}>{a.type}</Badge> <span className="ml-2 text-muted">{formatDate(a.date)}</span></span>
-                    <span className="tabular">{a.quantity ? `${formatQty(a.quantity)} @ ${formatMoney(a.price, a.currency, { hidden })} · ` : ""}<Money value={a.amount} currency={a.currency} signed /></span>
+                    <span className="tabular">{a.quantity ? `${formatQty(a.quantity)} @ ${formatMoney(conv ? d.activity[i]?.price ?? a.price : a.price, conv ? cur : a.currency, { hidden })} · ` : ""}<Money value={conv ? d.activity[i]?.amount ?? a.amount : a.amount} currency={conv && d.activity[i]?.amount ? cur : a.currency} signed /></span>
                   </li>
                 ))}
               </ul>
             )}
           </div>
         </div>
-      )}
+        );
+      })()}
     </Sheet>
   );
 }

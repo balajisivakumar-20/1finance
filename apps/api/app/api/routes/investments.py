@@ -15,7 +15,7 @@ from app.core.db import get_db
 from app.finance.money import ZERO
 from app.finance.returns import HoldingPL, ValuationPoint, decompose_change, money_weighted_return, time_weighted_return
 from app.models import Account, Connection, HoldingSnapshot, InvestmentTransaction, Security, User
-from app.services.ledger import Ledger, end_of_day, to_base
+from app.services.ledger import Ledger, end_of_day, load_fx, to_base
 
 router = APIRouter(prefix="/investments", tags=["investments"])
 INVEST_TYPES = ("brokerage", "investment")
@@ -48,14 +48,9 @@ def _value_at(ledger: Ledger, ids: list[int], at: datetime, base: str) -> tuple[
                 missing.append(h.currency)
             else:
                 hv += v
-        import bisect
-        s = ledger.balances.get(aid)
-        if s:
-            i = bisect.bisect_right(s.times, at) - 1
-            if i >= 0:
-                b = s.values[i]
-                v = to_base(ledger.fx, b.balance, b.currency, base, at)
-                cash += v or ZERO
+        for b in ledger.balances_at(aid, at):
+            v = to_base(ledger.fx, b.balance, b.currency, base, at)
+            cash += v or ZERO
     return hv, cash, missing
 
 
@@ -113,6 +108,8 @@ def holdings(scope: str = "all", user: User = Depends(current_user), db: Session
             v = to_base(ledger.fx, h.market_value, h.currency, base, now)
             total += v or ZERO
             pl = HoldingPL(h.market_value, h.cost_basis)
+            rate = to_base(ledger.fx, Decimal(1), h.currency, base, now)
+            disp = lambda x: m(x * rate, base) if rate is not None and x is not None else None  # noqa: E731
             s: Security = h.security
             rows.append({"security_id": s.id, "account_id": aid, "name": s.name, "ticker": s.ticker, "isin": s.isin,
                          "asset_class": s.asset_class, "exchange": s.exchange, "country": s.country, "sector": s.sector,
@@ -122,6 +119,10 @@ def holdings(scope: str = "all", user: User = Depends(current_user), db: Session
                          "cost_basis": m(h.cost_basis, h.currency), "unrealized": m(pl.unrealized, h.currency),
                          "unrealized_pct": pct(pl.unrealized_pct), "currency": h.currency,
                          "market_value_base": m(v, base), "_v": v or ZERO, "price_type": h.price_type,
+                         # the same figures in the reporting currency, converted at today's rate (None if no rate)
+                         "display_currency": base, "average_price_display": disp(h.average_price),
+                         "current_price_display": disp(h.market_price), "cost_basis_display": disp(h.cost_basis),
+                         "unrealized_display": disp(pl.unrealized),
                          "valuation_timestamp": h.valuation_timestamp,
                          "is_stale": now - h.valuation_timestamp > timedelta(days=3), "is_demo": a.is_demo})
     for r in rows:
@@ -204,7 +205,24 @@ def holding_detail(security_id: int, account_id: int, user: User = Depends(curre
                                                               InvestmentTransaction.security_id == security_id)
                            .order_by(InvestmentTransaction.execution_timestamp.desc()).limit(50)))
     pl = HoldingPL(last.market_value, last.cost_basis)
+    fx, now = load_fx(db), datetime.now(timezone.utc)
+
+    def conv(v, cur, at=now):
+        return m(to_base(fx, v, cur, base, at), base) if v is not None else None
+
+    dividends = sum((x.amount for x in acts if x.activity_type == "dividend"), ZERO)
     return {
+        "display": {
+            "currency": base, "average_price": conv(last.average_price, last.currency), "current_price": conv(last.market_price, last.currency),
+            "market_value": conv(last.market_value, last.currency), "total_invested": conv(last.cost_basis, last.currency),
+            "unrealized": conv(pl.unrealized, last.currency),
+            "dividends_total": m(sum((to_base(fx, x.amount, x.currency, base, x.execution_timestamp) or ZERO
+                                      for x in acts if x.activity_type == "dividend"), ZERO), base),
+            "price_history": [{"date": s.valuation_timestamp.date().isoformat(), "price": conv(s.market_price, s.currency, s.valuation_timestamp)}
+                              for s in snaps],
+            "activity": [{"price": conv(x.price, x.currency, x.execution_timestamp), "amount": conv(x.amount, x.currency, x.execution_timestamp)}
+                         for x in acts],
+        },
         "security": {"id": sec.id, "name": sec.name, "ticker": sec.ticker, "isin": sec.isin, "asset_class": sec.asset_class,
                      "exchange": sec.exchange, "currency": sec.trading_currency, "sector": sec.sector, "country": sec.country},
         "quantity": qty(last.quantity), "average_price": m(last.average_price, last.currency),
@@ -215,5 +233,5 @@ def holding_detail(security_id: int, account_id: int, user: User = Depends(curre
         "price_history": [{"date": s.valuation_timestamp.date().isoformat(), "price": m(s.market_price, s.currency)} for s in snaps],
         "activity": [{"date": x.execution_timestamp, "type": x.activity_type, "quantity": qty(x.quantity), "price": m(x.price, x.currency),
                       "amount": m(x.amount, x.currency), "fees": m(x.fees, x.currency), "currency": x.currency} for x in acts],
-        "dividends_total": m(sum((x.amount for x in acts if x.activity_type == "dividend"), ZERO), last.currency),
+        "dividends_total": m(dividends, last.currency),
     }

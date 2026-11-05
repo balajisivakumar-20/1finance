@@ -93,8 +93,8 @@ export default function AccountsPage() {
                   </div>
                   <div className="mt-5 flex items-end justify-between gap-3">
                     <div>
-                      <p className="text-2xl font-semibold tracking-tight text-ink"><Money value={a.balance} currency={a.currency} /></p>
-                      {a.currency !== currency && <p className="mt-0.5 text-[14.5px] text-muted">≈ <Money value={a.balance_base} currency={currency} /></p>}
+                      <p className="text-2xl font-semibold tracking-tight text-ink"><Money value={a.balance_base ?? a.balance} currency={a.balance_base ? currency : a.currency} /></p>
+                      {a.currency !== currency && <p className="mt-0.5 text-[14.5px] text-muted"><Money value={a.balance} currency={a.currency} /> in {a.currency}</p>}
                       {a.investments_value_local && <p className="mt-0.5 text-[14.5px] text-muted">Cash <Money value={a.cash_balance} currency={a.currency} /> · holdings included</p>}
                     </div>
                     <Badge tone="outline">{a.currency}</Badge>

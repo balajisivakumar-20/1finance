@@ -4,13 +4,15 @@
 """
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+
 from celery import Celery
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.core.config import get_settings
 from app.core.db import session_factory
 from app.fx.providers import ECBProvider, store_rates
-from app.models import Connection
+from app.models import Connection, ExchangeRate
 from app.sync.engine import run_sync
 
 celery = Celery("onefinance", broker=get_settings().redis_url, backend=get_settings().redis_url)
@@ -55,7 +57,10 @@ def sync_all_connections() -> int:
 def refresh_fx() -> int:
     db = session_factory()()
     try:
-        n = store_rates(db, ECBProvider())
+        # past activity (dividends, trades) is converted at its own date, so fetch the full history once
+        oldest = db.scalar(select(func.min(ExchangeRate.effective_timestamp)))
+        full = oldest is None or oldest > datetime.now(timezone.utc) - timedelta(days=400)
+        n = store_rates(db, ECBProvider(), history=full)
         db.commit()
         return n
     finally:

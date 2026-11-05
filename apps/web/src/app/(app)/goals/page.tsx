@@ -10,14 +10,21 @@ import { Badge, Button, Card, EmptyState, ErrorState, Field, Input, NativeSelect
 import { Modal, Sheet } from "@/components/ui/overlay";
 import { api } from "@/lib/api";
 import { CURRENCIES, formatDate, formatPct, type MoneyStr } from "@/lib/format";
-import { useAccounts } from "@/lib/hooks";
+import { useAccounts, useCurrency } from "@/lib/hooks";
 
 interface Entry { id: number; date: string; amount: MoneyStr; currency: string; note: string | null }
 interface Goal {
   id: number; name: string; type: string; target: MoneyStr; currency: string; target_date: string | null; current: MoneyStr; remaining: MoneyStr;
   progress_pct: MoneyStr; monthly_plan: MoneyStr | null; estimated_completion: string | null; on_track: boolean | null; linked_account_id: number | null;
   history: { date: string; amount: MoneyStr }[]; contributions: Entry[];
+  display: Shown | null; // the same figures in the reporting currency chosen in the top bar
 }
+interface Shown {
+  currency: string; target: MoneyStr; current: MoneyStr; remaining: MoneyStr; monthly_plan: MoneyStr | null;
+  history: { date: string; amount: MoneyStr }[];
+}
+/** What a goal card shows: converted to the reporting currency when a rate is available, else the goal's own currency. */
+const shown = (g: Goal): Shown => g.display ?? g;
 const TYPES: { value: string; label: string; icon: React.ElementType }[] = [
   { value: "general", label: "General savings", icon: Target },
   { value: "car", label: "Car / vehicle", icon: Car },
@@ -37,7 +44,11 @@ export default function GoalsPage() {
   const [editing, setEditing] = React.useState<Goal | "new" | null>(null);
   const [logFor, setLogFor] = React.useState<{ goal: Goal; entry?: Entry } | null>(null);
   const [openId, setOpenId] = React.useState<number | null>(null);
-  const { data, isLoading, isError, error, refetch } = useQuery({ queryKey: ["goals"], queryFn: () => api<{ items: Goal[]; overlaps: { account_id: number; goals: string[] }[] }>("/goals") });
+  const currency = useCurrency();
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["goals", currency],
+    queryFn: () => api<{ items: Goal[]; overlaps: { account_id: number; goals: string[] }[] }>(`/goals?currency=${currency}`),
+  });
   const refresh = () => qc.invalidateQueries({ queryKey: ["goals"] });
   const del = useMutation({ mutationFn: (id: number) => api(`/goals/${id}`, { method: "DELETE" }), onSuccess: () => { toast.success("Goal deleted"); setOpenId(null); refresh(); } });
   const open = data?.items.find((g) => g.id === openId) ?? null;
@@ -56,6 +67,7 @@ export default function GoalsPage() {
         {data?.items.map((g) => {
           const Icon = ICON[g.type] ?? Flag;
           const pct = Number(g.progress_pct);
+          const v = shown(g);
           return (
             <Card key={g.id} className="flex flex-col p-5">
               <div className="flex items-start gap-3">
@@ -69,16 +81,17 @@ export default function GoalsPage() {
               <div className="mt-5 flex items-end justify-between">
                 <div>
                   <p className="text-[14.5px] text-muted">Saved so far</p>
-                  <p className="text-2xl font-semibold tracking-tight text-ink"><Money value={g.current} currency={g.currency} decimals={0} /></p>
+                  <p className="text-2xl font-semibold tracking-tight text-ink"><Money value={v.current} currency={v.currency} decimals={0} /></p>
                 </div>
-                <p className="text-[15.5px] text-muted">of <Money value={g.target} currency={g.currency} decimals={0} /></p>
+                <p className="text-right text-[15.5px] text-muted">of <Money value={v.target} currency={v.currency} decimals={0} />
+                  {v.currency !== g.currency && <span className="block text-[13.5px] text-faint">Goal set in {g.currency}</span>}</p>
               </div>
               <Progress className="mt-3" value={pct} label={`${g.name} progress`} />
-              <div className="mt-2 flex justify-between text-[14.5px] text-muted"><span>{formatPct(g.progress_pct, { decimals: 0 })} complete</span><span><Money value={g.remaining} currency={g.currency} decimals={0} /> to go</span></div>
-              {g.history.length > 1 && <div className="mt-3"><MiniLine points={g.history.map((h) => ({ date: h.date, v: h.amount }))} currency={g.currency} height={70} /></div>}
+              <div className="mt-2 flex justify-between text-[14.5px] text-muted"><span>{formatPct(g.progress_pct, { decimals: 0 })} complete</span><span><Money value={v.remaining} currency={v.currency} decimals={0} /> to go</span></div>
+              {v.history.length > 1 && <div className="mt-3"><MiniLine points={v.history.map((h) => ({ date: h.date, v: h.amount }))} currency={v.currency} height={70} /></div>}
               <div className="mt-auto pt-4">
                 <p className="flex items-center gap-1.5 text-[14.5px] text-ink-2"><CalendarClock className="size-3.5 text-muted" />
-                  {g.estimated_completion ? <>Est. completion {formatDate(g.estimated_completion, "MMM yyyy")} at <Money value={g.monthly_plan} currency={g.currency} decimals={0} />/month</> : "Set a monthly plan to estimate completion"}</p>
+                  {g.estimated_completion ? <>Est. completion {formatDate(g.estimated_completion, "MMM yyyy")} at <Money value={v.monthly_plan} currency={v.currency} decimals={0} />/month</> : "Set a monthly plan to estimate completion"}</p>
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" className="flex-1" onClick={() => setLogFor({ goal: g })}><Plus />Log savings</Button>
                   <Button size="sm" variant="ghost" aria-label={`${g.name} savings log`} onClick={() => setOpenId(g.id)}><History />{g.contributions.length}</Button>
@@ -106,7 +119,7 @@ function GoalLogSheet({ goal, onClose, onLog, onEdit, onChanged }: { goal: Goal;
   });
   return (
     <Sheet open onOpenChange={(o) => !o && onClose()} title={goal.name}
-      description={<>Saved <Money value={goal.current} currency={goal.currency} decimals={0} /> of <Money value={goal.target} currency={goal.currency} decimals={0} />{goal.target_date && <> · by {formatDate(goal.target_date)}</>}</>}
+      description={<>Saved <Money value={shown(goal).current} currency={shown(goal).currency} decimals={0} /> of <Money value={shown(goal).target} currency={shown(goal).currency} decimals={0} />{goal.target_date && <> · by {formatDate(goal.target_date)}</>}</>}
       footer={<div className="flex gap-2"><Button className="flex-1" variant="primary" onClick={() => onLog()}><Plus />Log savings</Button><Button onClick={onEdit}><Pencil />Edit goal</Button></div>}>
       {goal.contributions.length ? (
         <ul className="divide-y divide-line">

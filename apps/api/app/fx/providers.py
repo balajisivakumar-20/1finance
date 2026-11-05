@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.models import ExchangeRate
 
 ECB_DAILY = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
-ECB_HIST_90 = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"
+ECB_HIST = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml"  # every working day since 1999
 NS = {"e": "http://www.ecb.int/vocabulary/2002-08-01/eurofxref"}
 
 
@@ -46,17 +46,17 @@ class ECBProvider(ExchangeRateProvider):
         return out
 
     def fetch(self, history: bool = False):
-        r = self.http.get(ECB_HIST_90 if history else ECB_DAILY)
+        r = self.http.get(ECB_HIST if history else ECB_DAILY)
         r.raise_for_status()
         return self.parse(r.text, self.quotes)
 
 
 def store_rates(db: Session, provider: ExchangeRateProvider, history: bool = False) -> int:
     n = 0
+    have = set(db.execute(select(ExchangeRate.base_currency, ExchangeRate.quote_currency, ExchangeRate.effective_timestamp)
+                          .where(ExchangeRate.provider == provider.name)).tuples())
     for base, quote, rate, ts in provider.fetch(history):
-        exists = db.scalar(select(ExchangeRate.id).where(ExchangeRate.base_currency == base, ExchangeRate.quote_currency == quote,
-                                                         ExchangeRate.provider == provider.name, ExchangeRate.effective_timestamp == ts))
-        if not exists:
+        if (base, quote, ts) not in have:
             db.add(ExchangeRate(base_currency=base, quote_currency=quote, rate=rate, provider=provider.name, effective_timestamp=ts))
             n += 1
     db.flush()

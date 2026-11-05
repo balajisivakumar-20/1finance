@@ -2,6 +2,9 @@ import os
 
 os.environ.setdefault("ONEFINANCE_ENV", "test")
 os.environ.setdefault("ONEFINANCE_DATABASE_URL", "postgresql+psycopg://onefinance:onefinance@localhost:5432/onefinance_test")
+# the suite runs against the demo dataset, whatever a developer's local .env says
+os.environ["ONEFINANCE_DEMO_MODE"] = "true"
+os.environ["ONEFINANCE_ALLOW_MOCK_CONNECTORS"] = "true"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

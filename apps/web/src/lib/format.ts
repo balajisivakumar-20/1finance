@@ -117,3 +117,10 @@ export function greeting(now = new Date()): string {
 }
 
 export const CURRENCIES = ["EUR", "INR", "USD", "GBP"] as const;
+/** Currencies offered in the top-bar switcher for viewing every amount. */
+export const DISPLAY_CURRENCIES = [
+  { code: "EUR", name: "Euro" },
+  { code: "USD", name: "US Dollar" },
+  { code: "INR", name: "Indian Rupee" },
+  { code: "GBP", name: "British Pound" },
+] as const;

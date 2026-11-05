@@ -197,3 +197,55 @@ def test_manual_goal_tracking(client):
     other = client.get("/api/v1/goals").json()["items"][0]["id"]
     assert client.delete(f"/api/v1/goals/{other}/contributions/{c1}").status_code == 404
     client.delete(f"/api/v1/goals/{gid}")
+
+
+def test_account_card_counts_all_cash_currencies_and_holdings(client, db):
+    from datetime import datetime, timezone
+
+    from app.models import AccountBalanceSnapshot, HoldingSnapshot, Security
+
+    r = client.post("/api/v1/accounts/manual", json={"name": "Broker", "account_type": "brokerage", "currency": "EUR", "balance": "0"})
+    aid = r.json()["id"]
+    ts = datetime.now(timezone.utc)
+    db.add_all([AccountBalanceSnapshot(account_id=aid, balance=D("10"), currency="EUR", valuation_timestamp=ts, source="test"),
+                AccountBalanceSnapshot(account_id=aid, balance=D("50"), currency="USD", valuation_timestamp=ts, source="test")])
+    for ticker, value in (("AAA", "100"), ("BBB", "200")):
+        sec = Security(ticker=ticker, name=ticker, asset_class="stock", trading_currency="USD")
+        db.add(sec)
+        db.flush()
+        db.add(HoldingSnapshot(account_id=aid, security_id=sec.id, quantity=D("1"), average_price=D(value), market_price=D(value),
+                               market_value=D(value), cost_basis=D(value), currency="USD", price_type="close",
+                               valuation_timestamp=ts, source="test"))
+    db.commit()
+    from app.services.ledger import load_fx, to_base
+
+    eur = lambda usd: to_base(load_fx(db), D(usd), "USD", "EUR", ts)  # noqa: E731
+    card = next(a for a in client.get("/api/v1/accounts").json()["accounts"] if a["id"] == aid)
+    # both cash currencies and both positions count, not just one row of the snapshot
+    assert abs(D(card["cash_balance"]) - (D("10") + eur("50"))) < D("0.02")
+    assert abs(D(card["balance"]) - (D("10") + eur("350"))) < D("0.02")
+
+
+def test_goals_shown_in_selected_currency(client):
+    gid = client.post("/api/v1/goals", json={"name": "Trip", "goal_type": "travel", "target_amount": "1000", "currency": "EUR"}).json()["id"]
+    client.post(f"/api/v1/goals/{gid}/contributions", json={"amount": "250"})
+    g = next(x for x in client.get("/api/v1/goals?currency=INR").json()["items"] if x["id"] == gid)
+    assert g["currency"] == "EUR" and D(g["target"]) == 1000  # the goal itself is unchanged
+    d = g["display"]
+    rate = D(d["target"]) / 1000
+    assert d["currency"] == "INR" and rate > 50
+    assert D(d["current"]) == (250 * rate).quantize(D("0.01")) and D(d["remaining"]) == (750 * rate).quantize(D("0.01"))
+    assert client.get("/api/v1/goals?currency=EUR").json()["items"][-1]["display"]["target"] == "1000.00"
+
+
+def test_holdings_shown_in_selected_currency(client):
+    native = client.get("/api/v1/investments/holdings?scope=institution:groww&currency=EUR").json()["items"]
+    h = native[0]
+    assert h["currency"] == "INR" and h["display_currency"] == "EUR"  # trading currency is kept
+    rate = D(h["market_value_base"]) / D(h["market_value"])
+    for f in ("average_price", "current_price", "unrealized"):
+        assert abs(D(h[f + "_display"]) - D(h[f]) * rate) <= D("0.01") + abs(D(h[f])) * D("0.0001")
+    d = client.get(f"/api/v1/investments/holdings/{h['security_id']}?account_id={h['account_id']}&currency=GBP").json()
+    assert d["currency"] == "INR" and d["display"]["currency"] == "GBP"
+    assert D(d["display"]["market_value"]) < D(d["market_value"])  # 1 INR is a fraction of a pound
+    assert len(d["display"]["activity"]) == len(d["activity"])
