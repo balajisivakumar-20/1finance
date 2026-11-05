@@ -234,9 +234,9 @@ function AccountsCard({ className }: { className?: string }) {
                 <p className="truncate text-[14.5px] text-muted">{a.institution} · {ACCOUNT_TYPE_LABEL[a.account_type] ?? a.account_type}{a.masked_reference ? ` · ${a.masked_reference}` : ""}</p>
               </div>
               <div className="text-right">
-                <p className="text-[16.5px] font-semibold text-ink"><Money value={a.balance} currency={a.currency} /></p>
+                <p className="text-[16.5px] font-semibold text-ink"><Money value={a.balance_base ?? a.balance} currency={a.balance_base ? currency : a.currency} /></p>
                 <div className="mt-0.5 flex justify-end">
-                  {a.currency !== currency ? <span className="text-[14px] text-muted">≈ <Money value={a.balance_base} currency={currency} /></span>
+                  {a.currency !== currency ? <span className="text-[14px] text-muted"><Money value={a.balance} currency={a.currency} /> in {a.currency}</span>
                     : <ConnectionStatus status={a.connection_status} lastSync={a.last_sync} stale={a.is_stale} />}
                 </div>
               </div>

@@ -97,6 +97,9 @@ export interface Holding {
   exchange: string | null; country: string | null; sector: string | null; brokerage: string; quantity: MoneyStr;
   average_price: MoneyStr; current_price: MoneyStr; market_value: MoneyStr; cost_basis: MoneyStr; unrealized: MoneyStr;
   unrealized_pct: MoneyStr; currency: string; market_value_base: MoneyStr; allocation_pct: MoneyStr; price_type: string;
+  /** Same figures in the reporting currency (null when no exchange rate is available). */
+  display_currency: string; average_price_display: MoneyStr | null; current_price_display: MoneyStr | null;
+  cost_basis_display: MoneyStr | null; unrealized_display: MoneyStr | null;
   valuation_timestamp: string; is_stale: boolean; is_demo: boolean;
 }
 export interface Connector {

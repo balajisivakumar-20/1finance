@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, ChevronsUpDown, Eye, EyeOff, LogOut, Monitor, Moon, MoreHorizontal, PanelLeft, RefreshCw, Search, Settings, ShieldCheck, Sun } from "lucide-react";
+import { Bell, ChevronDown, ChevronsUpDown, Eye, EyeOff, LogOut, Monitor, Moon, MoreHorizontal, PanelLeft, RefreshCw, Search, Settings, ShieldCheck, Sun } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { LogoMark } from "@/components/brand";
 import { Badge, Button } from "@/components/ui/primitives";
@@ -12,7 +12,7 @@ import { Menu, MenuContent, MenuItem, MenuLabel, MenuRadioGroup, MenuRadioItem, 
 import { CommandMenu } from "./command-menu";
 import { NAV, SECTIONS, currentNav, isActive, type NavItem } from "./nav";
 import { api } from "@/lib/api";
-import { CURRENCIES, ago } from "@/lib/format";
+import { DISPLAY_CURRENCIES, ago, currencySymbol } from "@/lib/format";
 import { useCurrency, useMe, useSummary, useSyncAll } from "@/lib/hooks";
 import { useUi } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -194,16 +194,28 @@ function CurrencyMenu() {
   const setCurrency = useUi((s) => s.setCurrency);
   return (
     <Menu>
-      <MenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-9 px-2.5 font-semibold tabular" aria-label={`Reporting currency ${c}`}>{c}</Button>
-      </MenuTrigger>
-      <MenuContent>
-        <MenuLabel>Reporting currency</MenuLabel>
+      <Tip content="Show amounts in">
+        <MenuTrigger asChild>
+          <Button variant="secondary" size="sm" className="h-9 gap-1.5 px-3 font-semibold tabular" aria-label={`Showing amounts in ${c}. Change currency`}>
+            <span aria-hidden className="text-accent-fg">{currencySymbol(c)}</span>
+            <span className="hidden sm:inline">{c}</span>
+            <ChevronDown className="size-3.5 opacity-60" />
+          </Button>
+        </MenuTrigger>
+      </Tip>
+      <MenuContent align="end">
+        <MenuLabel>Show amounts in</MenuLabel>
         <MenuRadioGroup value={c} onValueChange={(v) => setCurrency(v)}>
-          {CURRENCIES.map((x) => <MenuRadioItem key={x} value={x}>{x}</MenuRadioItem>)}
+          {DISPLAY_CURRENCIES.map((x) => (
+            <MenuRadioItem key={x.code} value={x.code}>
+              <span className="w-5 text-center font-semibold text-accent-fg">{currencySymbol(x.code)}</span>
+              {x.name}
+              <span className="ml-auto pl-4 text-[13.5px] text-faint">{x.code}</span>
+            </MenuRadioItem>
+          ))}
         </MenuRadioGroup>
         <MenuSeparator />
-        <p className="px-2.5 pb-1.5 pt-1 text-[13.5px] leading-snug text-faint">Original currencies are always preserved; conversions use stored exchange rates.</p>
+        <p className="max-w-[240px] px-2.5 pb-1.5 pt-1 text-[13.5px] leading-snug text-faint">Converted with the latest European Central Bank rates. Transactions keep their original currency.</p>
       </MenuContent>
     </Menu>
   );
